@@ -1,22 +1,38 @@
 package com.example.apptive19thhjfundbackend.user.data.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long number;
+    private Long id;
 
-    @Column(nullable = false)
-    private String email;
+    @Column(nullable = false, unique = true) // email
+    private String uid;
 
     @Column(nullable = false)
     private String nickName;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
     private String passWord;
 
@@ -24,51 +40,48 @@ public class User {
 
     private LocalDateTime updatedAt;
 
-    public Long getNumber() {
-        return number;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Builder.Default
+    private List<String> roles = new ArrayList<>();
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
     }
 
-    public void setNumber(Long number) {
-        this.number = number;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public String getUsername() {
+        return this.uid;
     }
 
-    public String getEmail() {
-        return email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public String getPassword() {
+        return this.passWord;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
-    public String getNickName() {
-        return nickName;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
     }
 
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
     }
 
-    public String getPassWord() {
-        return passWord;
-    }
-
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
-
-    public LocalDateTime getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

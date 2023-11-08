@@ -9,11 +9,6 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class UserResponseDto {
-
-    private Long id;
-    private String uid;
-    private String nickName;
-    private String passWord;
-
+public class EntryPointErrorResponse {
+    private String msg;
 }
