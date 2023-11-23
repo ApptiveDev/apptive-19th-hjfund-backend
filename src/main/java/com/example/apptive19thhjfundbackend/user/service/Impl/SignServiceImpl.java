@@ -11,6 +11,8 @@ import com.example.apptive19thhjfundbackend.user.service.SignService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -89,6 +91,32 @@ public class SignServiceImpl implements SignService {
         return signInResultDto;
     }
 
+    @Override
+    public String info() {
+        UserDetails userDetails = contextHolder();
+        System.out.println("현재 로그인된 사용자 정보" + userDetails.getUsername() + " " + userDetails.getAuthorities());
+        return "";
+    }
+
+    @Override
+    public String update(String password) { // username으로 찾아서 password만 바꾸고 다시 save
+        UserDetails userDetails = contextHolder();
+
+        User findUser = userRepository.getByUid(userDetails.getUsername());
+        findUser.setPassWord(passwordEncoder.encode(password));
+
+        User savedUser = userRepository.save(findUser);
+        return savedUser.getPassword();
+    }
+
+
+    @Override
+    public void delete() {
+        UserDetails userDetails = contextHolder();
+
+        userRepository.deleteByUid(userDetails.getUsername());
+    }
+
     private void setSuccessResult(SignUpResultDto result) {
         result.setSuccess(true);
         result.setCode(CommonResponse.SUCCESS.getCode());
@@ -99,5 +127,11 @@ public class SignServiceImpl implements SignService {
         result.setSuccess(false);
         result.setCode(CommonResponse.FAIL.getCode());
         result.setMsg(CommonResponse.FAIL.getMsg());
+    }
+
+    private UserDetails contextHolder() { //로그인 된 사용자 정보
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails)principal;
+        return userDetails;
     }
 }

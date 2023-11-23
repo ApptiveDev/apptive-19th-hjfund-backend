@@ -13,4 +13,12 @@ public class SignUpResultDto {
     private boolean success;
     private int code;
     private String msg;
+
+    public String print() {
+        return "SignUpResultDto{" +
+                "success=" + success +
+                ", code=" + code +
+                ", msg='" + msg + '\'' +
+                '}';
+    }
 }

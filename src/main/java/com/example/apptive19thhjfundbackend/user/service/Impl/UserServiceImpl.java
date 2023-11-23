@@ -27,7 +27,7 @@ public class UserServiceImpl implements UserService {
         userResponseDto.setId(user.getId());
         userResponseDto.setUid(user.getUid());
         userResponseDto.setNickName(user.getNickName());
-        userResponseDto.setPassWord(user.getPassword());
+        userResponseDto.setRole(user.getRoles().get(0));
 
         return userResponseDto;
     }
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
         userResponseDto.setId(savedUser.getId());
         userResponseDto.setUid(savedUser.getUid());
         userResponseDto.setNickName(savedUser.getNickName());
-        userResponseDto.setPassWord(savedUser.getPassword());
+        userResponseDto.setRole(savedUser.getRoles().get(0));
 
         return userResponseDto;
     }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         userResponseDto.setId(changedUser.getId());
         userResponseDto.setUid(changedUser.getUid());
         userResponseDto.setNickName(changedUser.getNickName());
-        userResponseDto.setPassWord(changedUser.getPassword());
+        userResponseDto.setRole(changedUser.getRoles().get(0));
 
         return userResponseDto;
     }

@@ -14,6 +14,6 @@ public class UserResponseDto {
     private Long id;
     private String uid;
     private String nickName;
-    private String passWord;
+    private String role;
 
 }

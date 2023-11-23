@@ -1,7 +1,10 @@
 package com.example.apptive19thhjfundbackend.user.data.entity;
 
+import com.example.apptive19thhjfundbackend.user.data.dto.UserDto;
+import com.example.apptive19thhjfundbackend.user.data.dto.UserResponseDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,8 +39,10 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String passWord;
 
+    @CreationTimestamp
     private LocalDateTime createAt;
 
+    @CreationTimestamp
     private LocalDateTime updatedAt;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -83,5 +88,9 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public UserResponseDto toUserResponseDto(){
+        return new UserResponseDto(this.id, this.getUid(), this.getNickName(), this.getRoles().get(0));
     }
 }
