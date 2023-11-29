@@ -11,12 +11,14 @@ import java.time.LocalDateTime;
 public class PostListResponseDto {
     private Long id;
     private String title;
+    private String thumb;
     private String author;
 
     @Builder
     public PostListResponseDto(Post entity) {
         this.id = entity.getId();
         this.title = entity.getTitle();
-        this.author = entity.getAuthor();
+        this.thumb = entity.getThumb();
+        this.author = entity.getAuthor().getNickName();
     }
 }

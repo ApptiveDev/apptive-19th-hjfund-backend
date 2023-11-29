@@ -37,14 +37,14 @@ public class ImageS3Service{
         return random+originName;
     }
 
-    public String uploadImageToS3(MultipartFile image) throws Exception{ //이미지를 S3에 업로드하고 이미지의 url을 반환
+    public String uploadImageToS3(MultipartFile image) throws Exception { //이미지를 S3에 업로드하고 이미지의 url을 반환
         String originName = image.getOriginalFilename(); //원본 이미지 이름
         String contentType = image.getContentType(); //확장자
         String fileExtension;
 
         //jpeg, jpg, png만 허용
         if (Objects.isNull(contentType)) {
-            throw new Exception("dd");
+            throw new Exception("정상적인 파일이 아닙니다.");
         }
         else if (contentType.contains("image/jpeg") ||
                 contentType.contains("image/jpg"))
@@ -69,20 +69,21 @@ public class ImageS3Service{
              */
             url = amazonS3Client.getUrl(bucketName, "images/" + changedName).toString();
         } catch (IOException | AmazonS3Exception e) {
-            throw new Exception("dd");
+            throw new Exception("이미지 저장 중 오류가 발생했습니다.");
         }
         return url; //데이터베이스에 저장할 이미지가 저장된 주소
 
     }
 
 
-    public ContentFile uploadImage(MultipartFile image) throws Exception{
+    public ContentFile uploadImage(MultipartFile image, int order) throws Exception {
         String originName = image.getOriginalFilename();
         String contentType = image.getContentType(); //확장자
         String storedImagePath = uploadImageToS3(image);
 
         ContentFile fileEntity = ContentFile.builder()
                     .type(contentType)
+                    .order(order)
                     .name(originName)
                     .url(storedImagePath)
                     .build();

@@ -5,31 +5,35 @@ import com.example.apptive19thhjfundbackend.post.data.dto.PostResponseDto;
 import com.example.apptive19thhjfundbackend.post.data.dto.PostSaveRequestDto;
 import com.example.apptive19thhjfundbackend.post.data.dto.PostUpdateRequestDto;
 import com.example.apptive19thhjfundbackend.post.service.PostService;
+import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/post")
+@RequestMapping("/api/report")
 public class PostController {
 
     private final PostService postService;
-    @PostMapping(consumes = "application/x-www-form-urlencoded", path = "/new")
-    public ResponseEntity<?> save(PostSaveRequestDto requestDto) {
-        postService.save(requestDto);
+    @PostMapping(consumes = "application/x-www-form-urlencoded", path = "/")
+    public ResponseEntity<?> save(@AuthenticationPrincipal User user, PostSaveRequestDto requestDto) throws Exception{
+        postService.save(user, requestDto);
 
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @ResponseBody
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody PostUpdateRequestDto requestDto)
+    //본인이 쓴 글 여부 체크 코드 추가 예정
+    public ResponseEntity<?> update(@PathVariable Long id, @RequestBody PostUpdateRequestDto requestDto) throws Exception
     {
         postService.update(id, requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(null);
@@ -43,16 +47,17 @@ public class PostController {
     }
     @ResponseBody
     @DeleteMapping("/{id}")
+    //본인이 쓴 글 여부 체크 코드 추가 예정
     public ResponseEntity<?> delete(@PathVariable Long id)
     {
         postService.delete(id);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<?> findAll(@RequestParam(defaultValue = "0") int page)
+    @GetMapping("/")
+    public ResponseEntity<?> findAll(@RequestParam int count, @RequestParam int index, @RequestParam String sortby)
     {
-        Page<PostListResponseDto> responseDto = postService.findAllDesc(page);
+        Page<PostListResponseDto> responseDto = postService.findAllDesc(count, index, sortby);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 

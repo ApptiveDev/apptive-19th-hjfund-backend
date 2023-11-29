@@ -2,11 +2,18 @@ package com.example.apptive19thhjfundbackend.post.data.entity;
 
 import com.example.apptive19thhjfundbackend.BaseTimeEntity;
 //import com.example.apptive19thhjfundbackend.user.data.entity.User;
+import com.example.apptive19thhjfundbackend.file.entity.ContentFile;
+import com.example.apptive19thhjfundbackend.post.data.dto.PostUpdateRequestDto;
+import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
+
+import static javax.persistence.CascadeType.REMOVE;
+import static javax.persistence.FetchType.LAZY;
 
 @Getter
 @NoArgsConstructor
@@ -21,27 +28,36 @@ public class Post extends BaseTimeEntity {
     private String title;
 
     @Column(length = 500, nullable = false)
-    private String company;
+    private String ticker;
 
     @Column(columnDefinition = "TEXT", nullable = false)
-    private String article;
+    private String content;
 
-//    @ManyToOne
-//    private User author;
-    private String author;
+    @Column(length = 500, nullable = false)
+    private String thumb;
 
 
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User author;
+
+    @OneToMany(fetch = LAZY, mappedBy = "post", cascade = REMOVE)
+    private List<ContentFile> contentFiles;
 
     @Builder
-    public Post(String title, String content, String author) {
+    public Post(String title, String ticker, String content, String thumb, User author) {
         this.title = title;
+        this.ticker = ticker;
         this.content = content;
+        this.thumb = thumb;
         this.author = author;
     }
 
-    public void update(String title, String content) {
-        this.title = title;
-        this.content = content;
+    public void update(PostUpdateRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.ticker = requestDto.getTicker();
+        this.content = requestDto.getContent();
+        this.thumb = requestDto.getThumb();
     }
 
 }
