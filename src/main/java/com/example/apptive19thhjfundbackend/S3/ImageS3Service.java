@@ -1,6 +1,7 @@
 package com.example.apptive19thhjfundbackend.S3;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.example.apptive19thhjfundbackend.file.entity.ContentFile;
@@ -18,19 +19,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ImageS3Service{
-    private final AmazonS3Client amazonS3Client;
+    private final AmazonS3 amazonS3;
 
     @Value("${cloud.aws.s3.bucketName}")
     private String bucketName; //버킷 이름
-
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
-    @Value("cloud.aws.credentials.accessKey")
-    private String accessKey;
-
-    @Value("cloud.aws.credentials.secretKey")
-    private String secretKey;
 
     private String changedImageName(String originName) { //이미지 이름 중복 방지를 위해 랜덤으로 생성
         String random = UUID.randomUUID().toString();
@@ -59,7 +51,7 @@ public class ImageS3Service{
         String url = null;
         try {
             metadata.setContentLength(image.getBytes().length);
-            PutObjectResult putObjectResult = amazonS3Client.putObject(new PutObjectRequest(
+            PutObjectResult putObjectResult = amazonS3.putObject(new PutObjectRequest(
                     bucketName, "images/" + changedName, image.getInputStream(), metadata
             ).withCannedAcl(CannedAccessControlList.PublicRead));
             /*
@@ -67,7 +59,7 @@ public class ImageS3Service{
             image.transferTo(file);
             PutObjectResult putObjectResult = amazonS3.putObject(bucketName, "images/" + changedName, file);
              */
-            url = amazonS3Client.getUrl(bucketName, "images/" + changedName).toString();
+            url = amazonS3.getUrl(bucketName, "images/" + changedName).toString();
         } catch (IOException | AmazonS3Exception e) {
             throw new Exception("이미지 저장 중 오류가 발생했습니다.");
         }
@@ -98,11 +90,11 @@ public class ImageS3Service{
             String fileKey = fileUrl.substring(51); // 폴더/파일.확장자
             String key = URLDecoder.decode(fileKey, StandardCharsets.UTF_8);
 
-            boolean isObjectExist = amazonS3Client.doesObjectExist(bucketName, key);
+            boolean isObjectExist = amazonS3.doesObjectExist(bucketName, key);
 
             if (isObjectExist) {
                 try {
-                    amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, key));
+                    amazonS3.deleteObject(new DeleteObjectRequest(bucketName, key));
                 } catch (AmazonServiceException e) {
                     throw e;
                 }
