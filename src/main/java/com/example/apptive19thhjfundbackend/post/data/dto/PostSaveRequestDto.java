@@ -13,7 +13,6 @@ import java.io.File;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 public class PostSaveRequestDto {
     private String title;
     private String ticker;

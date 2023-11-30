@@ -15,8 +15,6 @@ import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
-@DynamicInsert
-@DynamicUpdate
 @Entity
 @Getter
 @NoArgsConstructor(access = PROTECTED)
@@ -28,6 +26,7 @@ public class ContentFile extends BaseTimeEntity  implements Comparable<ContentFi
     @Column(nullable = false, updatable = false)
     private Long id;
 
+    @Column(nullable = false, name = "\"order\"")
     private int order;
 
     @ManyToOne(fetch = LAZY)

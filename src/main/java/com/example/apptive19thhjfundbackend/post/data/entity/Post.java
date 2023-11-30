@@ -18,6 +18,7 @@ import static javax.persistence.FetchType.LAZY;
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(name = "post")
 public class Post extends BaseTimeEntity {
 
     @Id
