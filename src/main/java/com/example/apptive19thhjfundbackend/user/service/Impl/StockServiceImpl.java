@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 public class StockServiceImpl implements StockService {
     public StockRepository stockRepository;
 
+
     @Autowired
     public StockServiceImpl(StockRepository stockRepository) {
         this.stockRepository = stockRepository;
@@ -21,6 +22,12 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public List<StockDto> findStocks(String key) {
+        List<Stock> stocks = stockRepository.findByNameStartingWith(key);
+        return stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<StockDto> findStocks(char key) {
         List<Stock> stocks = stockRepository.findByNameStartingWith(key);
         return stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
     }

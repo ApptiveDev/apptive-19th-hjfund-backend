@@ -4,6 +4,7 @@ import com.example.apptive19thhjfundbackend.user.common.CommonResponse;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignInResultDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignUpResultDto;
+import com.example.apptive19thhjfundbackend.user.data.entity.Profile;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import com.example.apptive19thhjfundbackend.user.data.repository.UserRepository;
 import com.example.apptive19thhjfundbackend.user.service.SignService;
@@ -54,6 +55,7 @@ public class SignServiceImpl implements SignService {
         }
 
         User savedUser = userRepository.save(user);
+//        System.out.println(savedUser);
         SignUpResultDto signUpResultDto = new SignInResultDto();
 
         LOGGER.info("[getSignUpResult] userEntity 값이 들어왔는지 확인 후 결과값 주입");
@@ -91,31 +93,7 @@ public class SignServiceImpl implements SignService {
         return signInResultDto;
     }
 
-    @Override
-    public String info() {
-        UserDetails userDetails = contextHolder();
-        System.out.println("현재 로그인된 사용자 정보" + userDetails.getUsername() + " " + userDetails.getAuthorities());
-        return "";
-    }
 
-    @Override
-    public String update(String password) { // username으로 찾아서 password만 바꾸고 다시 save
-        UserDetails userDetails = contextHolder();
-
-        User findUser = userRepository.getByUid(userDetails.getUsername());
-        findUser.setPassWord(passwordEncoder.encode(password));
-
-        User savedUser = userRepository.save(findUser);
-        return savedUser.getPassword();
-    }
-
-
-    @Override
-    public void delete() {
-        UserDetails userDetails = contextHolder();
-
-        userRepository.deleteByUid(userDetails.getUsername());
-    }
 
     private void setSuccessResult(SignUpResultDto result) {
         result.setSuccess(true);
@@ -129,9 +107,5 @@ public class SignServiceImpl implements SignService {
         result.setMsg(CommonResponse.FAIL.getMsg());
     }
 
-    private UserDetails contextHolder() { //로그인 된 사용자 정보
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails)principal;
-        return userDetails;
-    }
+
 }
