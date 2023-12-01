@@ -3,8 +3,6 @@ package com.example.apptive19thhjfundbackend.user.data.entity;
 import com.example.apptive19thhjfundbackend.user.data.dto.StockDto;
 import lombok.*;
 
-import javax.persistence.*;
-
 @Builder
 @Getter
 @AllArgsConstructor

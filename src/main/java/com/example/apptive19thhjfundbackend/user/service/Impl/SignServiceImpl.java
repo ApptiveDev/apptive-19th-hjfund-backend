@@ -55,7 +55,6 @@ public class SignServiceImpl implements SignService {
         }
 
         User savedUser = userRepository.save(user);
-//        System.out.println(savedUser);
         SignUpResultDto signUpResultDto = new SignInResultDto();
 
         LOGGER.info("[getSignUpResult] userEntity 값이 들어왔는지 확인 후 결과값 주입");
@@ -93,8 +92,6 @@ public class SignServiceImpl implements SignService {
         return signInResultDto;
     }
 
-
-
     private void setSuccessResult(SignUpResultDto result) {
         result.setSuccess(true);
         result.setCode(CommonResponse.SUCCESS.getCode());
@@ -106,6 +103,5 @@ public class SignServiceImpl implements SignService {
         result.setCode(CommonResponse.FAIL.getCode());
         result.setMsg(CommonResponse.FAIL.getMsg());
     }
-
 
 }

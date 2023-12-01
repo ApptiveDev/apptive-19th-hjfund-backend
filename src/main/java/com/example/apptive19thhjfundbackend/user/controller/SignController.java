@@ -59,7 +59,7 @@ public class SignController {
         return ResponseEntity.status(HttpStatus.OK).body(signUpResultDto);
     }
 
-    /*
+     /*
      *login/oauth
      */
 
@@ -72,7 +72,6 @@ public class SignController {
     /*
     * renew
     * */
-
 
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {

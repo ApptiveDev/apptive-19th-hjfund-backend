@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 public class StockServiceImpl implements StockService {
     public StockRepository stockRepository;
 
-
     @Autowired
     public StockServiceImpl(StockRepository stockRepository) {
         this.stockRepository = stockRepository;
