@@ -3,11 +3,6 @@ package com.example.apptive19thhjfundbackend.user.data.entity;
 import com.example.apptive19thhjfundbackend.user.data.dto.StockDto;
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 @Builder
 @Getter
 @AllArgsConstructor

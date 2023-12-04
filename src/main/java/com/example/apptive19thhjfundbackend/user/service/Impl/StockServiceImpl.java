@@ -26,6 +26,12 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
+    public List<StockDto> findStocks(char key) {
+        List<Stock> stocks = stockRepository.findByNameStartingWith(key);
+        return stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
+    }
+
+    @Override
     public List<StockDto> stockLists() {
         List<Stock> stocks = stockRepository.findAll();
         return stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
