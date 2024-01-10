@@ -10,6 +10,9 @@ import com.example.apptive19thhjfundbackend.post.data.dto.PostUpdateRequestDto;
 import com.example.apptive19thhjfundbackend.post.data.entity.Post;
 import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
+import com.example.apptive19thhjfundbackend.utils.errors.exceptions.Exception400;
+import com.example.apptive19thhjfundbackend.utils.errors.exceptions.Exception401;
+import com.example.apptive19thhjfundbackend.utils.errors.exceptions.Exception404;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +34,7 @@ public class PostService {
     private final ContentFileRepository contentFileRepository;
 
     @Transactional
-    public void save(User author, PostSaveRequestDto requestDto) throws Exception
+    public void save(User author, PostSaveRequestDto requestDto)
     {
         Post post = postRepository.save(requestDto.toEntity(author));
 
@@ -46,9 +49,12 @@ public class PostService {
     }
 
     @Transactional
-    public Long update(Long id, PostUpdateRequestDto requestDto) throws Exception {
+    public Long update(User user, Long id, PostUpdateRequestDto requestDto) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+                .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
+        if (!post.getAuthor().equals(user)) {
+            throw new Exception401("해당 회원이 작성한 게시글이 아닙니다. id=" + id);
+        }
 
         post.update(requestDto);
         List<ContentFile> contentFileList = post.getContentFiles();
@@ -65,7 +71,7 @@ public class PostService {
                 if (contentFileList.contains(i)) {
                     imageS3Service.deleteImageFromS3(i);
                 }else {
-                    throw new Exception("삭제하려는 파일이 게시물에 존재하지 않습니다.");
+                    throw new Exception404("삭제하려는 파일이 게시물에 존재하지 않습니다.");
                 }
             }
         }
@@ -73,9 +79,12 @@ public class PostService {
     }
 
     @Transactional
-    public void delete (Long id) {
+    public void delete (User user, Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+                .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
+        if (!post.getAuthor().equals(user)) {
+            throw new Exception401("해당 회원이 작성한 게시글이 아닙니다. id=" + id);
+        }
 
         postRepository.delete(post);
     }
@@ -83,15 +92,25 @@ public class PostService {
     @Transactional(readOnly = true)
     public PostResponseDto findById(Long id) {
         Post entity = postRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다. id=" + id));
+                .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
 
+        entity.updateViews();
         return new PostResponseDto(entity);
     }
 
     @Transactional(readOnly = true)
     //정렬 기준에 따라 정렬하는 코드 추가 예정
     public Page<PostListResponseDto> findAllDesc(int count, int index, String sortby) {
-        Sort sort = Sort.by("createAt").descending();
+        Sort sort = null;
+        if (sortby.equals("POPULAR")) {
+            sort = Sort.by("views").descending();
+        }
+        else if (sortby.equals("RECENT")) {
+            sort = Sort.by("createAt").descending();
+        }
+        else {
+            throw new Exception400("잘못된 정렬 기준 입니다. 정렬 기준: " + sortby);
+        }
         Pageable pageable = PageRequest.of(index, count, sort);
 
         return postRepository.findAll(pageable)

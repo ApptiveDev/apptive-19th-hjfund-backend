@@ -21,6 +21,7 @@ public class PostResponseDto {
     private String thumb;
     private String author;
     private List<String> files;
+    private int view;
 
     public PostResponseDto(Post entity) {
         this.id = entity.getId();
@@ -34,6 +35,7 @@ public class PostResponseDto {
             Collections.sort(contentFiles);
             this.files =  contentFileToUrl(contentFiles);
         }
+        this.view = entity.getViews();
     }
 
     private List<String> contentFileToUrl(List<ContentFile> contentFiles) {
