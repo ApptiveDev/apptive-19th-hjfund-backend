@@ -1,7 +1,6 @@
-package com.example.apptive19thhjfundbackend.user.config;
+package com.example.apptive19thhjfundbackend.stock.config;
 
-import com.example.apptive19thhjfundbackend.user.data.dto.StockDto;
-import com.example.apptive19thhjfundbackend.user.data.entity.Stock;
+import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;

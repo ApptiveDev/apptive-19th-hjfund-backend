@@ -33,8 +33,8 @@ public class SignController {
     @PostMapping(value = "/login")
     public ResponseEntity<SignInResultDto> signIn(
             HttpServletResponse response,
-            @ApiParam(value = "ID", required = true) @RequestParam String id,
-            @ApiParam(value = "Password", required = true) @RequestParam String password)
+            @RequestBody String id,
+            @RequestBody String password)
             throws RuntimeException {
         LOGGER.info("[signIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", id);
         SignInResultDto signInResultDto = signService.signIn(id, password);
@@ -48,10 +48,10 @@ public class SignController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<SignUpResultDto> signUp(
-            @ApiParam(value = "ID", required = true) @RequestParam String id,
-            @ApiParam(value = "Password", required = true) @RequestParam String password,
-            @ApiParam(value = "이름", required = true) @RequestParam String name,
-            @ApiParam(value = "권한", required = true) @RequestParam String role) {
+            @RequestBody String id,
+            @RequestBody String password,
+            @RequestBody String name,
+            @RequestBody String role) {
         LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", id, name, role);
         SignUpResultDto signUpResultDto = signService.signUp(id, password, name, role);
 

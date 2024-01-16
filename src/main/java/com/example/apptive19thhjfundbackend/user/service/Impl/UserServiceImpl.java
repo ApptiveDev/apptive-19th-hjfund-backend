@@ -1,13 +1,21 @@
 package com.example.apptive19thhjfundbackend.user.service.Impl;
 
+import com.example.apptive19thhjfundbackend.post.data.entity.Post;
+import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
 
+import com.example.apptive19thhjfundbackend.user.data.dto.CreatorPost;
+import com.example.apptive19thhjfundbackend.user.data.dto.UserInfo;
 import com.example.apptive19thhjfundbackend.user.data.entity.Profile;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import com.example.apptive19thhjfundbackend.user.data.repository.ProfileRepository;
 import com.example.apptive19thhjfundbackend.user.data.repository.UserRepository;
 import com.example.apptive19thhjfundbackend.user.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,29 +23,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    
+    private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
     public JwtTokenProvider jwtTokenProvider;
     public PasswordEncoder passwordEncoder;
 
-    @Autowired
-    public UserServiceImpl(UserRepository userRepository, ProfileRepository profileRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.profileRepository = profileRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.passwordEncoder = passwordEncoder;
-    }
-
     @Override
-    public User info() { // 사용자 정보 리턴
-        UserDetails userDetails = contextHolder();
-        User user = userInfo();
-        Profile profile = user.getProfile();
-        return user;
+    public UserInfo info() { // 사용자 정보 리턴
+        return userInfo().toUserInfo();
     }
 
     @Override
@@ -55,7 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override // Multipart S3에 저장 및 String 경로 저장
-    public User profile(String name, String bio, String phone) {
+    public UserInfo profile(String name, String bio, String phone) {
         User user = userInfo();
         Profile profile = user.getProfile();
         if (profile==null) {
@@ -71,7 +72,7 @@ public class UserServiceImpl implements UserService {
         user.setNickName(name);
         user.setProfile(savedProfile);
         User savedUser = userRepository.save(user);
-        return savedUser;
+        return savedUser.toUserInfo();
     }
 
     @Override
@@ -96,5 +97,20 @@ public class UserServiceImpl implements UserService {
         UserDetails userDetails = contextHolder();
         User user = userRepository.getByUid(userDetails.getUsername());
         return user;
+    }
+
+    @Override
+    public Page<UserInfo> allCreator(Pageable pageable) {
+        Page<User> users = userRepository.findByRoles("USER_ADMIN", pageable);
+        PageImpl<UserInfo> userInfos = new PageImpl<>(users.stream().map(user -> user.toUserInfo()).collect(Collectors.toList()));
+        return userInfos;
+    }
+
+    @Override
+    public CreatorPost creatorPosts(Long id, Pageable pageable) {
+        User user = userRepository.getById(id);
+        Page<Post> posts = postRepository.findByAuthorId(id, pageable);
+
+        return new CreatorPost(user.toUserInfo(), posts);
     }
 }

@@ -1,6 +1,6 @@
-package com.example.apptive19thhjfundbackend.user.data.dto;
+package com.example.apptive19thhjfundbackend.stock.data.dto;
 
-import com.example.apptive19thhjfundbackend.user.data.entity.Stock;
+import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
 import lombok.*;
 
 @Builder
