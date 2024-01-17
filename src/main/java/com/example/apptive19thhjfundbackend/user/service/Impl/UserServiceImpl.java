@@ -1,6 +1,8 @@
 package com.example.apptive19thhjfundbackend.user.service.Impl;
 
+
 import com.example.apptive19thhjfundbackend.S3.ImageS3Service;
+
 import com.example.apptive19thhjfundbackend.post.data.entity.Post;
 import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
@@ -33,9 +35,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
-
     private final ImageS3Service imageS3Service;
     private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public UserInfo info() { // 사용자 정보 리턴

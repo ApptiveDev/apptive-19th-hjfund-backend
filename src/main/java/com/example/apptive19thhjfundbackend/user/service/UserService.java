@@ -14,6 +14,7 @@ public interface UserService {
     String changePW(String old, String password) throws Exception;
     UserInfo profile(String name, String bio, String phone);
     String picture(MultipartFile photo) throws Exception;
+
     void delete();
 
     Page<UserInfo> allCreator(Pageable pageable);
