@@ -1,7 +1,9 @@
 package com.example.apptive19thhjfundbackend.user.data.dto;
 
 import com.example.apptive19thhjfundbackend.user.data.entity.Profile;
+import lombok.Getter;
 
+@Getter
 public class UserInfo {
     private Long id;
     private String uid; // email

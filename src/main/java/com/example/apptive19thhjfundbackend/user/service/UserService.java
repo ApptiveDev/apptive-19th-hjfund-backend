@@ -13,7 +13,7 @@ public interface UserService {
     UserInfo info();
     String changePW(String old, String password) throws Exception;
     UserInfo profile(String name, String bio, String phone);
-    String picture(MultipartFile photo);
+    String picture(MultipartFile photo) throws Exception;
     void delete();
 
     Page<UserInfo> allCreator(Pageable pageable);

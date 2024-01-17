@@ -6,9 +6,11 @@ import com.example.apptive19thhjfundbackend.user.data.dto.SignInResultDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignUpResultDto;
 import com.example.apptive19thhjfundbackend.user.data.entity.Profile;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
+import com.example.apptive19thhjfundbackend.user.data.repository.ProfileRepository;
 import com.example.apptive19thhjfundbackend.user.data.repository.UserRepository;
 import com.example.apptive19thhjfundbackend.user.service.SignService;
 
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,31 +21,35 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+@RequiredArgsConstructor
 @Service
 public class SignServiceImpl implements SignService {
     private final Logger LOGGER = LoggerFactory.getLogger(SignServiceImpl.class);
 
-    public UserRepository userRepository;
-    public JwtTokenProvider jwtTokenProvider;
-    public PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-    @Autowired
-    public SignServiceImpl(UserRepository userRepository, JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final ProfileRepository profileRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
-    public SignUpResultDto signUp(String id, String password, String name, String role) {
+    public SignUpResultDto signUp(String id, String password, String name, String role) throws Exception {
+        if (userRepository.getByUid(id)==null) {
+            throw new Exception("중복");
+        }
+
         LOGGER.info("[getSignUpResult] 회원 가입 정보 전달");
         User user;
+        Profile profile = new Profile();
+        profileRepository.save(profile);
         if (role.equalsIgnoreCase("admin")) {
             user = User.builder()
                     .uid(id)
                     .nickName(name)
                     .passWord(passwordEncoder.encode(password))
                     .roles(Collections.singletonList("ROLE_ADMIN"))
+                    .profile(profile)
                     .build();
         } else {
             user = User.builder()
@@ -51,6 +57,7 @@ public class SignServiceImpl implements SignService {
                     .nickName(name)
                     .passWord(passwordEncoder.encode(password))
                     .roles(Collections.singletonList("ROLE_USER"))
+                    .profile(profile)
                     .build();
         }
 
