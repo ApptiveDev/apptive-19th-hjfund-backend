@@ -1,9 +1,7 @@
 package com.example.apptive19thhjfundbackend.user.controller;
 
-import com.example.apptive19thhjfundbackend.user.data.dto.ChangeUserDto;
-import com.example.apptive19thhjfundbackend.user.data.dto.UserDto;
-import com.example.apptive19thhjfundbackend.user.data.dto.UserInfo;
-import com.example.apptive19thhjfundbackend.user.data.dto.UserResponseDto;
+
+import com.example.apptive19thhjfundbackend.user.data.dto.*;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import com.example.apptive19thhjfundbackend.user.data.repository.UserRepository;
 import com.example.apptive19thhjfundbackend.user.service.UserService;
@@ -33,18 +31,15 @@ public class UserController {
 
     @PutMapping(value = "/password") //
     public ResponseEntity<String> changPassword(
-            @RequestBody String old,
-            @RequestBody String password) throws Exception{
-        String updatedPass = userService.changePW(old, password);
+            @RequestBody PassWordDto passWordDto) throws Exception{
+        String updatedPass = userService.changePW(passWordDto.getOld(), passWordDto.getPassword());
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }
 
     @PutMapping(value = "/info") //
-    public ResponseEntity<UserInfo> showProfile(
-            @RequestBody String name,
-            @RequestBody String bio,
-            @RequestBody String phone) {
-        UserInfo savedUser = userService.profile(name, bio, phone);
+    public ResponseEntity<UserInfo> changeProfile(
+            @RequestBody ProfileDto profileDto) {
+        UserInfo savedUser = userService.profile(profileDto.getName(), profileDto.getBio(), profileDto.getPhone());
         return ResponseEntity.status(HttpStatus.OK).body(savedUser);
     }
 

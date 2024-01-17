@@ -4,7 +4,7 @@ import com.example.apptive19thhjfundbackend.user.data.dto.SignInResultDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignUpResultDto;
 
 public interface SignService {
-    SignUpResultDto signUp(String id, String password, String name, String role);
+    SignUpResultDto signUp(String id, String password, String name, String role) throws Exception;
     SignInResultDto signIn(String id, String password) throws RuntimeException;
 
 }
