@@ -1,6 +1,6 @@
-package com.example.apptive19thhjfundbackend.user.data.repository;
+package com.example.apptive19thhjfundbackend.stock.data.repository;
 
-import com.example.apptive19thhjfundbackend.user.data.entity.Stock;
+import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

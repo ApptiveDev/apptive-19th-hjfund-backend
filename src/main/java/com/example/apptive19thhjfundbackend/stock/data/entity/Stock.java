@@ -1,7 +1,12 @@
-package com.example.apptive19thhjfundbackend.user.data.entity;
+package com.example.apptive19thhjfundbackend.stock.data.entity;
 
-import com.example.apptive19thhjfundbackend.user.data.dto.StockDto;
+import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
 import lombok.*;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 @Builder
 @Getter

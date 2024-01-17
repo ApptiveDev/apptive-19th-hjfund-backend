@@ -1,8 +1,8 @@
-package com.example.apptive19thhjfundbackend.user.config;
+package com.example.apptive19thhjfundbackend.stock.config;
 
-import com.example.apptive19thhjfundbackend.user.data.dto.StockDto;
-import com.example.apptive19thhjfundbackend.user.data.entity.Stock;
-import com.example.apptive19thhjfundbackend.user.data.repository.StockRepository;
+import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
+import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
+import com.example.apptive19thhjfundbackend.stock.data.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Configuration;

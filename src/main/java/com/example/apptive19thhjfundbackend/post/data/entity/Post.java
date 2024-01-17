@@ -39,7 +39,7 @@ public class Post extends BaseTimeEntity {
 
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
     @OneToMany(fetch = LAZY, mappedBy = "post", cascade = REMOVE)

@@ -1,9 +1,8 @@
-package com.example.apptive19thhjfundbackend.user.controller;
+package com.example.apptive19thhjfundbackend.stock.controller;
 
-import com.example.apptive19thhjfundbackend.user.data.dto.StockDto;
-import com.example.apptive19thhjfundbackend.user.data.repository.StockRepository;
-import com.example.apptive19thhjfundbackend.user.service.SignService;
-import com.example.apptive19thhjfundbackend.user.service.StockService;
+import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
+import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
+import com.example.apptive19thhjfundbackend.stock.service.StockService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +42,21 @@ public class StockController {
         double secDiffTime = (afterTime - beforeTime)/1000.; //두 시간에 차 계산
         System.out.println("시간차이(m) : "+secDiffTime);
         return stocks;
+    }
+
+    @GetMapping(value = "/dummy")
+    public void dummy() {
+//        List<StockDto> stocks = stockService.stockLists();
+//        for(int i=99; i<=99; i++) {
+//            for (StockDto stockDto:stocks) {
+//                String s = stockDto.getName() + i;
+//                Stock stock = Stock.builder()
+//                        .code(stockDto.getCode())
+//                        .name(s)
+//                        .build();
+//                stockService.save(stock);
+//            }
+//        }
     }
 
 }
