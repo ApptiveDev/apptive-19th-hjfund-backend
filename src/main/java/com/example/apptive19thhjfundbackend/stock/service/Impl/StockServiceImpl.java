@@ -1,9 +1,9 @@
-package com.example.apptive19thhjfundbackend.user.service.Impl;
+package com.example.apptive19thhjfundbackend.stock.service.Impl;
 
-import com.example.apptive19thhjfundbackend.user.data.dto.StockDto;
-import com.example.apptive19thhjfundbackend.user.data.entity.Stock;
-import com.example.apptive19thhjfundbackend.user.data.repository.StockRepository;
-import com.example.apptive19thhjfundbackend.user.service.StockService;
+import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
+import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
+import com.example.apptive19thhjfundbackend.stock.data.repository.StockRepository;
+import com.example.apptive19thhjfundbackend.stock.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,4 +31,8 @@ public class StockServiceImpl implements StockService {
         return stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
     }
 
+    @Override
+    public void save(Stock stock) {
+        stockRepository.save(stock);
+    }
 }

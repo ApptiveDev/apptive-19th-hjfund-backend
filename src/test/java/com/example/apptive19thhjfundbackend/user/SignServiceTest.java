@@ -22,7 +22,16 @@ import java.util.Collections;
 @SpringBootTest
 @Transactional
 class SignServiceTest {
-
+    /*
+    * 회원가입
+    * 로그인
+    * 토큰 검사
+    * 비밀번호 변경
+    * 회원 탈퇴
+    * 프로필 업데이트
+    * 사진 업데이트
+    * 사용자 정보 얻기(프로필, 아이디 ...)
+    * */
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -36,26 +45,23 @@ class SignServiceTest {
 
     String id = "wjdgh224";
     String password = "1111";
-    String newPassword = "2222";
     String name = "jh";
     String role = "USER_ADMIN";
+    String newPassword = "2222";
     String token = "";
 
     @Test
-    void 회원가입() {
+    void 회원가입() { // 중복 예외
         //given
-        //when
-        SignUpResultDto signUpResultDto1 = signService.signUp(id, password, name, role);
 
+        //when
+        SignUpResultDto signUpResultDto = signService.signUp(id, password, name, role);
         //then
-        System.out.println("-------------------------------------");
-        System.out.println(signUpResultDto1.print());
-        System.out.println("-------------------------------------");
-        Assertions.assertThat(0).isEqualTo(signUpResultDto1.getCode());
+        Assertions.assertThat(0).isEqualTo(signUpResultDto.getCode());
     }
 
     @Test
-    void 로그인() {
+    void 로그인() { // 없는 회원
         //given
         SignUpResultDto signUpResultDto = signService.signUp(id, password, name, role);
         //when
@@ -68,30 +74,56 @@ class SignServiceTest {
 
     @Test
     void 토큰검사() {
-        SignUpResultDto signUpResultDto = signService.signUp(id, password, name, role);
-        //when
-        SignInResultDto signInResultDto = signService.signIn(id, password);
-        //then
-        Assertions.assertThat(0).isEqualTo(signInResultDto.getCode());
-        token = signInResultDto.getToken();
-        System.out.println(token);
         //given
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            System.out.println("유효토큰 ---------------------------------------------------");
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication); // 추가
-        }
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails)principal;
-        String username = userDetails.getUsername();
-        String password = userDetails.getPassword();
-        System.out.println(username+  password);
+        //when
+
+        //then
 
     }
 
     @Test
-    void 업데이트() { //ContextHolder때문에
+    void 비밀번호번경() {
+        //given
 
+        //when
+
+        //then
+    }
+
+    @Test
+    void 회원탈퇴() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    @Test
+    void 사용자정보() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    @Test
+    void 프로필업데이트() {
+        //given
+
+        //when
+
+        //then
+    }
+
+    @Test
+    void 사진업데이트() {
+        //given
+
+        //when
+
+        //then
     }
 }

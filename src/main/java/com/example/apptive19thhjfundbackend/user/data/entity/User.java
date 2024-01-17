@@ -1,6 +1,7 @@
 package com.example.apptive19thhjfundbackend.user.data.entity;
 
 import com.example.apptive19thhjfundbackend.user.data.dto.UserDto;
+import com.example.apptive19thhjfundbackend.user.data.dto.UserInfo;
 import com.example.apptive19thhjfundbackend.user.data.dto.UserResponseDto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -49,6 +50,10 @@ public class User implements UserDetails {
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
+    @OneToOne
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
@@ -92,5 +97,9 @@ public class User implements UserDetails {
 
     public UserResponseDto toUserResponseDto(){
         return new UserResponseDto(this.id, this.getUid(), this.getNickName(), this.getRoles().get(0));
+    }
+
+    public UserInfo toUserInfo() {
+        return new UserInfo(this.id, this.uid, this.nickName, this.roles.get(0), this.profile);
     }
 }

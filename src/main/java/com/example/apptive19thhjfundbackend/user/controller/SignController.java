@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/sign-api")
+@RequestMapping("/api/user/auth")
 public class SignController {
     private final Logger LOGGER = LoggerFactory.getLogger(SignController.class);
     private final SignService signService;
@@ -30,28 +30,28 @@ public class SignController {
         this.signService = signService;
     }
 
-    @PostMapping(value = "/sign-in")
+    @PostMapping(value = "/login")
     public ResponseEntity<SignInResultDto> signIn(
             HttpServletResponse response,
-        @ApiParam(value = "ID", required = true) @RequestParam String id,
-        @ApiParam(value = "Password", required = true) @RequestParam String password)
-        throws RuntimeException {
+            @RequestBody String id,
+            @RequestBody String password)
+            throws RuntimeException {
         LOGGER.info("[signIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", id);
         SignInResultDto signInResultDto = signService.signIn(id, password);
 
-        if(signInResultDto.getCode() == 0) {
+        if (signInResultDto.getCode() == 0) {
             LOGGER.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, signInResultDto.getToken());
         }
         response.setHeader("X-AUTH-TOKEN", signInResultDto.getToken());
         return ResponseEntity.status(HttpStatus.OK).body(signInResultDto);
     }
 
-    @PostMapping(value = "/sign-up")
+    @PostMapping(value = "/register")
     public ResponseEntity<SignUpResultDto> signUp(
-        @ApiParam(value = "ID", required = true) @RequestParam String id,
-        @ApiParam(value = "Password", required = true) @RequestParam String password,
-        @ApiParam(value = "이름", required = true) @RequestParam String name,
-        @ApiParam(value = "권한", required = true) @RequestParam String role) {
+            @RequestBody String id,
+            @RequestBody String password,
+            @RequestBody String name,
+            @RequestBody String role) {
         LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", id, name, role);
         SignUpResultDto signUpResultDto = signService.signUp(id, password, name, role);
 
@@ -59,30 +59,19 @@ public class SignController {
         return ResponseEntity.status(HttpStatus.OK).body(signUpResultDto);
     }
 
-    @GetMapping(value="/info")
-    public ResponseEntity<String> info() {
-        signService.info();
-        return ResponseEntity.status(HttpStatus.OK).body("");
-    }
-
-    @PutMapping(value = "/update") //
-    public ResponseEntity<String> update(
-            @ApiParam(value = "Password", required = true) @RequestParam String password) {
-        String updatedPass = signService.update(password);
-        return ResponseEntity.status(HttpStatus.OK).body(updatedPass);
-    }
-
-    @DeleteMapping(value = "/delete")
-    public ResponseEntity<String> delete() {
-        signService.delete();
-        return ResponseEntity.status(HttpStatus.OK).body("삭제되었습니다.");
-    }
+     /*
+     *login/oauth
+     */
 
 
     @GetMapping(value = "/exception")
     public void exceptionTest() throws RuntimeException {
         throw new RuntimeException("접근이 금지되었습니다.");
     }
+
+    /*
+    * renew
+    * */
 
     @ExceptionHandler(value = RuntimeException.class)
     public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
