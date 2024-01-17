@@ -1,6 +1,8 @@
 package com.example.apptive19thhjfundbackend.user.controller;
 
+import com.example.apptive19thhjfundbackend.user.data.dto.SignInDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignInResultDto;
+import com.example.apptive19thhjfundbackend.user.data.dto.SignUpDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignUpResultDto;
 import com.example.apptive19thhjfundbackend.user.service.SignService;
 import io.swagger.annotations.ApiParam;
@@ -33,14 +35,13 @@ public class SignController {
     @PostMapping(value = "/login")
     public ResponseEntity<SignInResultDto> signIn(
             HttpServletResponse response,
-            @RequestBody String id,
-            @RequestBody String password)
+            @RequestBody SignInDto signInDto)
             throws RuntimeException {
-        LOGGER.info("[signIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", id);
-        SignInResultDto signInResultDto = signService.signIn(id, password);
+        LOGGER.info("[signIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", signInDto.getEmail());
+        SignInResultDto signInResultDto = signService.signIn(signInDto.getEmail(), signInDto.getPassword());
 
         if (signInResultDto.getCode() == 0) {
-            LOGGER.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", id, signInResultDto.getToken());
+            LOGGER.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", signInDto.getEmail(), signInResultDto.getToken());
         }
         response.setHeader("X-AUTH-TOKEN", signInResultDto.getToken());
         return ResponseEntity.status(HttpStatus.OK).body(signInResultDto);
@@ -48,14 +49,11 @@ public class SignController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<SignUpResultDto> signUp(
-            @RequestBody String id,
-            @RequestBody String password,
-            @RequestBody String name,
-            @RequestBody String role) {
-        LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", id, name, role);
-        SignUpResultDto signUpResultDto = signService.signUp(id, password, name, role);
+            @ModelAttribute SignUpDto signUpDto) {
+        LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", signUpDto.getEmail(), signUpDto.getName(), signUpDto.getRole());
+        SignUpResultDto signUpResultDto = signService.signUp(signUpDto.getEmail(), signUpDto.getPassword(), signUpDto.getName(), signUpDto.getRole());
 
-        LOGGER.info("[signUp] 회원가입을 완료했습니다. id : {}", id);
+        LOGGER.info("[signUp] 회원가입을 완료했습니다. id : {}", signUpDto.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(signUpResultDto);
     }
 

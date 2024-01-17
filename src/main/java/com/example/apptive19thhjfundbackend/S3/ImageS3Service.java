@@ -83,6 +83,11 @@ public class ImageS3Service{
         return fileEntity;
     }
 
+    public String uploadImage(MultipartFile image) {
+        String storedImagePath = uploadImageToS3(image);
+        return storedImagePath;
+    }
+
     public void deleteImageFromS3(String fileUrl) {
         if (!fileUrl.contains("tripko-be6.s3.ap-northeast-2.amazonaws.com")) {
             return;
@@ -105,7 +110,7 @@ public class ImageS3Service{
 
             System.out.println(String.format("[%s] deletion complete", key));
 
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throw e;
         }
     }

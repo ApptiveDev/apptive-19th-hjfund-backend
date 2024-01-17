@@ -1,5 +1,8 @@
 package com.example.apptive19thhjfundbackend.user.service.Impl;
 
+
+import com.example.apptive19thhjfundbackend.S3.ImageS3Service;
+
 import com.example.apptive19thhjfundbackend.post.data.entity.Post;
 import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
@@ -30,11 +33,11 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    
     private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
-    public JwtTokenProvider jwtTokenProvider;
-    public PasswordEncoder passwordEncoder;
+    private final ImageS3Service imageS3Service;
+    private final PasswordEncoder passwordEncoder;
+
 
     @Override
     public UserInfo info() { // 사용자 정보 리턴
@@ -59,15 +62,8 @@ public class UserServiceImpl implements UserService {
     public UserInfo profile(String name, String bio, String phone) {
         User user = userInfo();
         Profile profile = user.getProfile();
-        if (profile==null) {
-            profile = Profile.builder()
-                    .bio(bio)
-                    .phone(phone)
-                    .build();
-        } else {
-            profile.setBio(bio);
-            profile.setPhone(phone);
-        }
+        profile.setBio(bio);
+        profile.setPhone(phone);
         Profile savedProfile = profileRepository.save(profile);
         user.setNickName(name);
         user.setProfile(savedProfile);
@@ -76,8 +72,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String picture(MultipartFile file) {
-        return " ";
+    public String picture(MultipartFile file) throws Exception {
+        String storedImagePath = imageS3Service.uploadImage(file);
+        return storedImagePath;
     }
 
     @Override
@@ -101,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Page<UserInfo> allCreator(Pageable pageable) {
-        Page<User> users = userRepository.findByRoles("USER_ADMIN", pageable);
+        Page<User> users = userRepository.findByRoles("ROLE_ADMIN", pageable);
         PageImpl<UserInfo> userInfos = new PageImpl<>(users.stream().map(user -> user.toUserInfo()).collect(Collectors.toList()));
         return userInfos;
     }
