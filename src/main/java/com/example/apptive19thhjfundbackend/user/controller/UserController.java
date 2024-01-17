@@ -48,8 +48,8 @@ public class UserController {
     */
 
     @PutMapping(value = "/picture") // 사진 변경
-    public ResponseEntity<String> changePicture(
-            @RequestParam MultipartFile file) {
+    public ResponseEntity<String> changePicture (
+            @RequestParam MultipartFile file) throws Exception {
         userService.picture(file);
         return ResponseEntity.status(HttpStatus.OK).body("ok");
     }

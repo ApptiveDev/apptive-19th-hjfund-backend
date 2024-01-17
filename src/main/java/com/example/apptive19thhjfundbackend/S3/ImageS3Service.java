@@ -5,6 +5,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
 import com.example.apptive19thhjfundbackend.file.entity.ContentFile;
+import com.example.apptive19thhjfundbackend.utils.errors.exceptions.Exception500;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -29,21 +30,21 @@ public class ImageS3Service{
         return random+originName;
     }
 
-    public String uploadImageToS3(MultipartFile image) throws Exception { //이미지를 S3에 업로드하고 이미지의 url을 반환
+    public String uploadImageToS3(MultipartFile image) { //이미지를 S3에 업로드하고 이미지의 url을 반환
         String originName = image.getOriginalFilename(); //원본 이미지 이름
         String contentType = image.getContentType(); //확장자
         String fileExtension;
 
         //jpeg, jpg, png만 허용
         if (Objects.isNull(contentType)) {
-            throw new Exception("정상적인 파일이 아닙니다.");
+            throw new Exception500("정상적인 파일이 아닙니다.");
         }
         else if (contentType.contains("image/jpeg") ||
                 contentType.contains("image/jpg"))
             fileExtension = "jpg";
         else if (contentType.contains("image/png"))
             fileExtension = "png";
-        else throw new Exception("dd");
+        else throw new Exception500("저장할 수 없는 확장자 명: " + contentType);
 
         String changedName = changedImageName(originName); //새로 생성된 이미지 이름
         ObjectMetadata metadata = new ObjectMetadata(); //메타데이터
@@ -61,14 +62,14 @@ public class ImageS3Service{
              */
             url = amazonS3.getUrl(bucketName, "images/" + changedName).toString();
         } catch (IOException | AmazonS3Exception e) {
-            throw new Exception("이미지 저장 중 오류가 발생했습니다.");
+            throw new Exception500("이미지 저장 중 오류가 발생했습니다.");
         }
         return url; //데이터베이스에 저장할 이미지가 저장된 주소
 
     }
 
 
-    public ContentFile uploadImage(MultipartFile image, int order) throws Exception {
+    public ContentFile uploadImage(MultipartFile image, int order) {
         String originName = image.getOriginalFilename();
         String contentType = image.getContentType(); //확장자
         String storedImagePath = uploadImageToS3(image);
@@ -82,12 +83,12 @@ public class ImageS3Service{
         return fileEntity;
     }
 
-    public String uploadImage(MultipartFile image) throws Exception {
+    public String uploadImage(MultipartFile image) {
         String storedImagePath = uploadImageToS3(image);
         return storedImagePath;
     }
 
-    public void deleteImageFromS3(String fileUrl) throws Exception{
+    public void deleteImageFromS3(String fileUrl) {
         if (!fileUrl.contains("tripko-be6.s3.ap-northeast-2.amazonaws.com")) {
             return;
         }
@@ -104,7 +105,7 @@ public class ImageS3Service{
                     throw e;
                 }
             } else {
-                throw new Exception("dd");
+                throw new Exception500("삭제 중 오류 발생");
             }
 
             System.out.println(String.format("[%s] deletion complete", key));

@@ -37,6 +37,8 @@ public class Post extends BaseTimeEntity {
     @Column(length = 500, nullable = false)
     private String thumb;
 
+    @Column(nullable = false)
+    private int views;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "author_id", nullable = false)
@@ -59,6 +61,10 @@ public class Post extends BaseTimeEntity {
         this.ticker = requestDto.getTicker();
         this.content = requestDto.getContent();
         this.thumb = requestDto.getThumb();
+    }
+
+    public void updateViews() {
+        this.views++;
     }
 
 }
