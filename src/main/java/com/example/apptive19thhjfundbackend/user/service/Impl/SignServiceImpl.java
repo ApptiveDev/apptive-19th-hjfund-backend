@@ -35,7 +35,7 @@ public class SignServiceImpl implements SignService {
 
     @Override
     public SignUpResultDto signUp(String id, String password, String name, String role) throws Exception {
-        if (userRepository.getByUid(id)==null) {
+        if (userRepository.getByUid(id)!=null) {
             throw new Exception("중복");
         }
 

@@ -49,7 +49,7 @@ public class SignController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<SignUpResultDto> signUp(
-            @ModelAttribute SignUpDto signUpDto) throws Exception {
+            @RequestBody SignUpDto signUpDto) throws Exception {
         LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", signUpDto.getEmail(), signUpDto.getName(), signUpDto.getRole());
         SignUpResultDto signUpResultDto = signService.signUp(signUpDto.getEmail(), signUpDto.getPassword(), signUpDto.getName(), signUpDto.getRole());
 

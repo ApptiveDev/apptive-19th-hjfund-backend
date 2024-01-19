@@ -3,13 +3,17 @@ package com.example.apptive19thhjfundbackend.stock.controller;
 import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
 import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
 import com.example.apptive19thhjfundbackend.stock.service.StockService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/api/stock")
 public class StockController {
 
     private final StockService stockService;
@@ -18,17 +22,18 @@ public class StockController {
         this.stockService = stockService;
     }
 
-    @GetMapping(value = "/stock")
-    public List<StockDto> search(@RequestParam String key) {
+    @GetMapping(value = "/")
+    public Page<StockDto> search(@RequestParam String key, @RequestParam int count, @RequestParam int index) {
+        PageRequest pageRequest = PageRequest.of(index, count);
 
-        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
-        System.out.println("이전시간" + beforeTime);
-        List<StockDto> stocks =  stockService.findStocks(key);
+//        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
+//        System.out.println("이전시간" + beforeTime);
+        Page<StockDto> stocks =  stockService.findStocks(key, pageRequest);
 
-        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
-        System.out.println("이후시간" + afterTime);
-        double secDiffTime = (afterTime - beforeTime)/1000.; //두 시간에 차 계산
-        System.out.println("시간차이(m) : "+secDiffTime);
+//        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+//        System.out.println("이후시간" + afterTime);
+//        double secDiffTime = (afterTime - beforeTime)/1000.; //두 시간에 차 계산
+//        System.out.println("시간차이(m) : "+secDiffTime);
         return stocks;
     }
     @GetMapping(value = "/stocks")
