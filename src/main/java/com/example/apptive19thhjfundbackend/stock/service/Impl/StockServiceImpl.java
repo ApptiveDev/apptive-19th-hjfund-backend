@@ -5,6 +5,9 @@ import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
 import com.example.apptive19thhjfundbackend.stock.data.repository.StockRepository;
 import com.example.apptive19thhjfundbackend.stock.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,9 +23,9 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public List<StockDto> findStocks(String key) {
-        List<Stock> stocks = stockRepository.findByNameStartingWith(key);
-        return stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
+    public Page<StockDto> findStocks(String key, Pageable pageable) {
+        Page<Stock> stocks = stockRepository.findByNameStartingWith(key, pageable);
+        return new PageImpl<>(stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList()));
     }
 
     @Override
