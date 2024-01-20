@@ -24,7 +24,7 @@ public class StockServiceImpl implements StockService {
 
     @Override
     public Page<StockDto> findStocks(String key, Pageable pageable) {
-        Page<Stock> stocks = stockRepository.findByNameStartingWith(key, pageable);
+        Page<Stock> stocks = stockRepository.findByNameStartingWith(key.toUpperCase(), pageable);
         return new PageImpl<>(stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList()));
     }
 

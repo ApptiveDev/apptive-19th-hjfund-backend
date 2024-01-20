@@ -1,5 +1,6 @@
 package com.example.apptive19thhjfundbackend.user.service.Impl;
 
+import com.example.apptive19thhjfundbackend._core.error.ex.Exception401;
 import com.example.apptive19thhjfundbackend.user.common.CommonResponse;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignInResultDto;
@@ -36,7 +37,7 @@ public class SignServiceImpl implements SignService {
     @Override
     public SignUpResultDto signUp(String id, String password, String name, String role) throws Exception {
         if (userRepository.getByUid(id)!=null) {
-            throw new Exception("중복");
+            throw new Exception401("INVALID_CREDENTIALS", false);
         }
 
         LOGGER.info("[getSignUpResult] 회원 가입 정보 전달");
@@ -82,8 +83,11 @@ public class SignServiceImpl implements SignService {
         LOGGER.info("[getSignInResult] Id : {}", id);
 
         LOGGER.info("[getSignInResult] 패스워드 비교 수행");
+        if(user.getUid().equals(id)) {
+            throw new Exception401("INVALID_CREDENTIALS", false);
+        }
         if(!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException();
+            throw new Exception401("INVALID_CREDENTIALS", false);
         }
         LOGGER.info("[getSignInResult] 패스워드 일치");
 
