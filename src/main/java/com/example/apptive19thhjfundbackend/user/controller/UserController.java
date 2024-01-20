@@ -23,6 +23,12 @@ public class UserController {
         this.userService = userService;
     }
 
+
+    @GetMapping(value="/test") // 사용자 계정 정보 조회
+    public String test() {
+        return "test";
+    }
+
     @GetMapping(value="") // 사용자 계정 정보 조회
     public ResponseEntity<UserInfo> userInfo() {
         UserInfo info = userService.info();

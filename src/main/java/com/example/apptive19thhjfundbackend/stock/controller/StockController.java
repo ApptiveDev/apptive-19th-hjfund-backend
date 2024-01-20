@@ -22,7 +22,7 @@ public class StockController {
         this.stockService = stockService;
     }
 
-    @GetMapping(value = "/")
+    @GetMapping(value = "")
     public Page<StockDto> search(@RequestParam String key, @RequestParam int count, @RequestParam int index) {
         PageRequest pageRequest = PageRequest.of(index, count);
 

@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.PostUpdate;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,15 +44,21 @@ public class SignController {
         if (signInResultDto.getCode() == 0) {
             LOGGER.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", signInDto.getEmail(), signInResultDto.getToken());
         }
-        response.setHeader("X-AUTH-TOKEN", signInResultDto.getToken());
+
+        Cookie cookie = new Cookie("X-AUTH-TOKEN", signInResultDto.getToken());
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        response.addCookie(cookie);
+//        response.setHeader("X-AUTH-TOKEN", signInResultDto.getToken());
         return ResponseEntity.status(HttpStatus.OK).body(signInResultDto);
     }
 
     @PostMapping(value = "/register")
     public ResponseEntity<SignUpResultDto> signUp(
             @RequestBody SignUpDto signUpDto) throws Exception {
-        LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", signUpDto.getEmail(), signUpDto.getName(), signUpDto.getRole());
-        SignUpResultDto signUpResultDto = signService.signUp(signUpDto.getEmail(), signUpDto.getPassword(), signUpDto.getName(), signUpDto.getRole());
+        LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", signUpDto.getEmail(), signUpDto.getName(), "USER");
+        SignUpResultDto signUpResultDto = signService.signUp(signUpDto.getEmail(), signUpDto.getPassword(), signUpDto.getName(), "USER");
 
         LOGGER.info("[signUp] 회원가입을 완료했습니다. id : {}", signUpDto.getEmail());
         return ResponseEntity.status(HttpStatus.OK).body(signUpResultDto);
