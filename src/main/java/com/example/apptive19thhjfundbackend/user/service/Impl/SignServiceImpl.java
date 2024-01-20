@@ -15,10 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 
@@ -26,9 +28,7 @@ import java.util.Collections;
 @Service
 public class SignServiceImpl implements SignService {
     private final Logger LOGGER = LoggerFactory.getLogger(SignServiceImpl.class);
-
     private final UserRepository userRepository;
-
     private final ProfileRepository profileRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -37,7 +37,7 @@ public class SignServiceImpl implements SignService {
     @Override
     public SignUpResultDto signUp(String id, String password, String name, String role) throws Exception {
         if (userRepository.getByUid(id)!=null) {
-            throw new Exception401("INVALID_CREDENTIALS", false);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
         }
 
         LOGGER.info("[getSignUpResult] 회원 가입 정보 전달");
@@ -83,11 +83,11 @@ public class SignServiceImpl implements SignService {
         LOGGER.info("[getSignInResult] Id : {}", id);
 
         LOGGER.info("[getSignInResult] 패스워드 비교 수행");
-        if(user.getUid().equals(id)) {
-            throw new Exception401("INVALID_CREDENTIALS", false);
+        if(!(user.getUid().equals(id))) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
         }
         if(!passwordEncoder.matches(password, user.getPassword())) {
-            throw new Exception401("INVALID_CREDENTIALS", false);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
         }
         LOGGER.info("[getSignInResult] 패스워드 일치");
 
