@@ -27,7 +27,7 @@ public class JwtTokenProvider {
     private final Logger LOGGER = LoggerFactory.getLogger(JwtTokenProvider.class);
     private final UserDetailsService userDetailsService;
 
-    @Value("${springboot.jwt.secret}")
+//    @Value("${springboot.jwt.secret}")
     private String secretKey = "secretKey";
     private final long tokenValidMillisecond=  1000L * 60 * 60;
 
