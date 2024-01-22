@@ -1,6 +1,7 @@
 package com.example.apptive19thhjfundbackend.stock.controller;
 
 import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
+import com.example.apptive19thhjfundbackend.stock.data.dto.StockResponseDto;
 import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
 import com.example.apptive19thhjfundbackend.stock.service.StockService;
 import org.springframework.data.domain.Page;
@@ -22,30 +23,37 @@ public class StockController {
         this.stockService = stockService;
     }
 
-    @GetMapping(value = "")
-    public Page<StockDto> search(@RequestParam String key, @RequestParam int count, @RequestParam int index) {
+    @GetMapping(value = "/name")
+    public StockResponseDto searchByName(@RequestParam String key, @RequestParam int count, @RequestParam int index) {
         PageRequest pageRequest = PageRequest.of(index, count);
 
 //        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
 //        System.out.println("이전시간" + beforeTime);
-        Page<StockDto> stocks =  stockService.findStocks(key, pageRequest);
+        StockResponseDto stock = stockService.findStocksByName(key, pageRequest);
 
 //        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
 //        System.out.println("이후시간" + afterTime);
 //        double secDiffTime = (afterTime - beforeTime)/1000.; //두 시간에 차 계산
 //        System.out.println("시간차이(m) : "+secDiffTime);
-        return stocks;
+        return stock;
     }
-    @GetMapping(value = "/stocks")
-    public List<StockDto> findAll() {
-        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
-        System.out.println("이전시간" + beforeTime);
-        List<StockDto> stocks =  stockService.stockLists();
+    @GetMapping(value = "/code")
+    public StockResponseDto searchByCode(@RequestParam int key, @RequestParam int count, @RequestParam int index) {
+        PageRequest pageRequest = PageRequest.of(index, count);
+        StockResponseDto stock = stockService.findStocksByCode(key, pageRequest);
+        return stock;
+    }
 
-        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
-        System.out.println("이후시간" + afterTime);
-        double secDiffTime = (afterTime - beforeTime)/1000.; //두 시간에 차 계산
-        System.out.println("시간차이(m) : "+secDiffTime);
+    @GetMapping(value = "/stocks")
+    public StockResponseDto findAll() {
+//        long beforeTime = System.currentTimeMillis(); //코드 실행 전에 시간 받아오기
+//        System.out.println("이전시간" + beforeTime);
+        StockResponseDto stocks = stockService.stockLists();
+
+//        long afterTime = System.currentTimeMillis(); // 코드 실행 후에 시간 받아오기
+//        System.out.println("이후시간" + afterTime);
+//        double secDiffTime = (afterTime - beforeTime)/1000.; //두 시간에 차 계산
+//        System.out.println("시간차이(m) : "+secDiffTime);
         return stocks;
     }
 

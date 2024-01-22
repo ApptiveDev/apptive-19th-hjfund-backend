@@ -1,7 +1,8 @@
 package com.example.apptive19thhjfundbackend.user.service.Impl;
 
-import com.example.apptive19thhjfundbackend._core.error.ex.Exception401;
 import com.example.apptive19thhjfundbackend.user.common.CommonResponse;
+import com.example.apptive19thhjfundbackend.user.common.ErrorCode;
+import com.example.apptive19thhjfundbackend.user.common.RestApiException;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignInResultDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.SignUpResultDto;
@@ -14,10 +15,7 @@ import com.example.apptive19thhjfundbackend.user.service.SignService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,7 +35,7 @@ public class SignServiceImpl implements SignService {
     @Override
     public SignUpResultDto signUp(String id, String password, String name, String role) throws Exception {
         if (userRepository.getByUid(id)!=null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
+            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
 
         LOGGER.info("[getSignUpResult] 회원 가입 정보 전달");
@@ -83,11 +81,14 @@ public class SignServiceImpl implements SignService {
         LOGGER.info("[getSignInResult] Id : {}", id);
 
         LOGGER.info("[getSignInResult] 패스워드 비교 수행");
+        if(user==null) {
+            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
+        }
         if(!(user.getUid().equals(id))) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
+            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
         if(!passwordEncoder.matches(password, user.getPassword())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS");
+            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
         }
         LOGGER.info("[getSignInResult] 패스워드 일치");
 

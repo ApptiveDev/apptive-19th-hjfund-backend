@@ -1,6 +1,7 @@
 package com.example.apptive19thhjfundbackend.stock.service.Impl;
 
 import com.example.apptive19thhjfundbackend.stock.data.dto.StockDto;
+import com.example.apptive19thhjfundbackend.stock.data.dto.StockResponseDto;
 import com.example.apptive19thhjfundbackend.stock.data.entity.Stock;
 import com.example.apptive19thhjfundbackend.stock.data.repository.StockRepository;
 import com.example.apptive19thhjfundbackend.stock.service.StockService;
@@ -23,15 +24,26 @@ public class StockServiceImpl implements StockService {
     }
 
     @Override
-    public Page<StockDto> findStocks(String key, Pageable pageable) {
+    public StockResponseDto findStocksByName(String key, Pageable pageable) {
         Page<Stock> stocks = stockRepository.findByNameStartingWith(key.toUpperCase(), pageable);
-        return new PageImpl<>(stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList()));
+        List<StockDto> collect = stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
+        return new StockResponseDto(collect, stocks.getTotalPages(), stocks.getNumberOfElements(), stocks.getSize(), stocks.getNumber());
     }
 
     @Override
-    public List<StockDto> stockLists() {
+    public StockResponseDto findStocksByCode(int key, Pageable pageable) {
+        Page<Stock> stocks = stockRepository.findByCodeStartingWith(key, pageable);
+        List<StockDto> collect = stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
+        return new StockResponseDto(collect, stocks.getTotalPages(), stocks.getNumberOfElements(), stocks.getSize(), stocks.getNumber());
+
+    }
+
+    @Override
+    public StockResponseDto stockLists() {
         List<Stock> stocks = stockRepository.findAll();
-        return stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
+        List<StockDto> collect = stocks.stream().map(stock -> stock.toDto()).collect(Collectors.toList());
+        return new StockResponseDto(collect, 1, stocks.size(), stocks.size(), stocks.size());
+
     }
 
     @Override

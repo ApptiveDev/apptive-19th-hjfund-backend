@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface StockRepository extends JpaRepository<Stock, Long> {
     Page<Stock> findByNameStartingWith(String key, Pageable pageable);
-    List<Stock> findByNameStartingWith(char key);
+    Page<Stock> findByCodeStartingWith(int key, Pageable pageable);
 
 }
