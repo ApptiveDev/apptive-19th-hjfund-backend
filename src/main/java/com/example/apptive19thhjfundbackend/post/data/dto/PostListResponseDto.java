@@ -17,9 +17,11 @@ public class PostListResponseDto {
     private Author author;
     private int view;
     private int likes;
+    private boolean like;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    @Getter
     public class Author {
         private Long id;
         private String name;
@@ -32,7 +34,7 @@ public class PostListResponseDto {
     }
 
     @Builder
-    public PostListResponseDto(Post entity) {
+    public PostListResponseDto(Post entity, boolean state) {
         this.id = entity.getId();
         this.title = entity.getTitle();
         this.ticker = entity.getTicker();
@@ -42,5 +44,6 @@ public class PostListResponseDto {
         this.createdAt = entity.getCreateAt();
         this.updatedAt = entity.getUpdateAt();
         this.likes = entity.getLikes();
+        this.like = state;
     }
 }

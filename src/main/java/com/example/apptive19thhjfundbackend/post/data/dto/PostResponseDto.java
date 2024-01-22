@@ -30,6 +30,7 @@ public class PostResponseDto {
     private LocalDateTime updatedAt;
 
 
+    @Getter
     public class Author {
         private Long id;
         private String name;
