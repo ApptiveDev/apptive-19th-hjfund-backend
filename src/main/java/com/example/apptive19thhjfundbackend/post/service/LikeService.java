@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -22,7 +23,7 @@ public class LikeService {
     @Transactional
     public LikeResponseDto doLike(User user, Long id) {
         if (user == null) {
-            new Exception404("로그인이 필요합니다.");
+            throw new Exception404("로그인이 필요합니다.");
         }
 
         Post post = postRepository.findById(id)
@@ -42,7 +43,7 @@ public class LikeService {
     @Transactional
     public boolean findLikeByUserAndPost(User user, Post post) {
         if (user == null) {
-            new Exception404("로그인이 필요합니다.");
+            throw new Exception404("로그인이 필요합니다.");
         }
 
         Optional<Like> like = likeRepository.findByUserAndPost(user, post);
@@ -53,9 +54,13 @@ public class LikeService {
     }
 
     @Transactional
-    public int countLikeByPost(Post post) {
-        int likes = likeRepository.countAllByPost(post);
+    public List<Post> findLikeByUser(User user) {
+        if (user == null) {
+            throw new Exception404("로그인이 필요합니다.");
+        }
 
-        return likes;
+        List<Like> likes = likeRepository.findAllByUser(user);
+        List<Post> posts = likes.stream().map(l -> l.getPost()).collect(Collectors.toList());
+        return posts;
     }
 }
