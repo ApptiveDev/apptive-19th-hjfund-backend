@@ -8,6 +8,7 @@ import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
 
 import com.example.apptive19thhjfundbackend.user.data.dto.CreatorPost;
+import com.example.apptive19thhjfundbackend.user.data.dto.CreatorResponseDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.UserInfo;
 import com.example.apptive19thhjfundbackend.user.data.entity.Profile;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -97,10 +99,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<UserInfo> allCreator(Pageable pageable) {
+    public CreatorResponseDto allCreator(Pageable pageable) {
         Page<User> users = userRepository.findByRoles("ROLE_ADMIN", pageable);
-        PageImpl<UserInfo> userInfos = new PageImpl<>(users.stream().map(user -> user.toUserInfo()).collect(Collectors.toList()));
-        return userInfos;
+        List<UserInfo> collect = users.stream().map(user -> user.toUserInfo()).collect(Collectors.toList());
+        return new CreatorResponseDto(collect, users.getTotalPages(), users.getNumberOfElements(), users.getSize(), users.getNumber());
     }
 
     @Override

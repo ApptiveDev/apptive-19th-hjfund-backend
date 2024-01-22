@@ -45,10 +45,9 @@ public class SignController {
             LOGGER.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", signInDto.getEmail(), signInResultDto.getToken());
         }
 
-        Cookie cookie = new Cookie("X-AUTH-TOKEN", signInResultDto.getToken());
+        Cookie cookie = new Cookie("token", signInResultDto.getToken());
         cookie.setPath("/");
         cookie.setHttpOnly(true);
-        cookie.setSecure(true);
         response.addCookie(cookie);
 //        response.setHeader("X-AUTH-TOKEN", signInResultDto.getToken());
         return ResponseEntity.status(HttpStatus.OK).body(signInResultDto);
@@ -78,18 +77,18 @@ public class SignController {
     * renew
     * */
 
-    @ExceptionHandler(value = RuntimeException.class)
-    public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
-        HttpHeaders responseHeaders = new HttpHeaders();
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-
-        LOGGER.error("ExceptionHandler 호출, {}, {}", e.getCause(), e.getMessage());
-
-        Map<String, String> map = new HashMap<>();
-        map.put("error type", httpStatus.getReasonPhrase());
-        map.put("code", "400");
-        map.put("message", "에러 발생");
-
-        return new ResponseEntity<>(map, responseHeaders, httpStatus);
-    }
+//    @ExceptionHandler(value = RuntimeException.class)
+//    public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
+//        HttpHeaders responseHeaders = new HttpHeaders();
+//        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+//
+//        LOGGER.error("ExceptionHandler 호출, {}, {}", e.getCause(), e.getMessage());
+//
+//        Map<String, String> map = new HashMap<>();
+//        map.put("error type", httpStatus.getReasonPhrase());
+//        map.put("code", "400");
+//        map.put("message", "에러 발생");
+//
+//        return new ResponseEntity<>(map, responseHeaders, httpStatus);
+//    }
 }
