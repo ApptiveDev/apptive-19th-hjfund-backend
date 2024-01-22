@@ -1,6 +1,7 @@
 package com.example.apptive19thhjfundbackend.user.controller;
 
 import com.example.apptive19thhjfundbackend.user.data.dto.CreatorPost;
+import com.example.apptive19thhjfundbackend.user.data.dto.CreatorResponseDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.UserInfo;
 import com.example.apptive19thhjfundbackend.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +12,15 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/")
+@RequestMapping("/api")
 public class CreatorController {
 
     private final UserService userService;
 
-    @GetMapping("/")
-    public Page<UserInfo> allCreator(@RequestParam int count, @RequestParam int index) {
+    @GetMapping("")
+    public CreatorResponseDto allCreator(@RequestParam int count, @RequestParam int index) {
         PageRequest pageRequest = PageRequest.of(index, count);
-        Page<UserInfo> userInfos = userService.allCreator(pageRequest);
+        CreatorResponseDto userInfos = userService.allCreator(pageRequest);
         return userInfos;
     }
 

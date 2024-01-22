@@ -1,9 +1,6 @@
 package com.example.apptive19thhjfundbackend.user.service;
 
-import com.example.apptive19thhjfundbackend.user.data.dto.CreatorPost;
-import com.example.apptive19thhjfundbackend.user.data.dto.UserDto;
-import com.example.apptive19thhjfundbackend.user.data.dto.UserInfo;
-import com.example.apptive19thhjfundbackend.user.data.dto.UserResponseDto;
+import com.example.apptive19thhjfundbackend.user.data.dto.*;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +14,6 @@ public interface UserService {
 
     void delete();
 
-    Page<UserInfo> allCreator(Pageable pageable);
+    CreatorResponseDto allCreator(Pageable pageable);
     CreatorPost creatorPosts(Long id, Pageable pageable);
 }
