@@ -3,10 +3,7 @@ package com.example.apptive19thhjfundbackend.post.service;
 import com.example.apptive19thhjfundbackend.S3.ImageS3Service;
 import com.example.apptive19thhjfundbackend.file.dao.ContentFileRepository;
 import com.example.apptive19thhjfundbackend.file.entity.ContentFile;
-import com.example.apptive19thhjfundbackend.post.data.dto.PostListResponseDto;
-import com.example.apptive19thhjfundbackend.post.data.dto.PostResponseDto;
-import com.example.apptive19thhjfundbackend.post.data.dto.PostSaveRequestDto;
-import com.example.apptive19thhjfundbackend.post.data.dto.PostUpdateRequestDto;
+import com.example.apptive19thhjfundbackend.post.data.dto.*;
 import com.example.apptive19thhjfundbackend.post.data.entity.Post;
 import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
@@ -32,10 +29,13 @@ public class PostService {
     private final PostRepository postRepository;
     private final ImageS3Service imageS3Service;
     private final ContentFileRepository contentFileRepository;
-
+    private final LikeService likeService;
     @Transactional
-    public void save(User author, PostSaveRequestDto requestDto)
+    public PostSaveResponseDto save(User author, PostSaveRequestDto requestDto)
     {
+        if (author == null) {
+            new Exception404("로그인이 필요합니다.");
+        }
         Post post = postRepository.save(requestDto.toEntity(author));
 
         if (!requestDto.getFiles().isEmpty()) {
@@ -46,10 +46,14 @@ public class PostService {
             }
             contentFileRepository.saveAll(fileEntities);
         }
+        return new PostSaveResponseDto(post.getId());
     }
 
     @Transactional
     public Long update(User user, Long id, PostUpdateRequestDto requestDto) {
+        if (user == null) {
+            new Exception404("로그인이 필요합니다.");
+        }
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
         if (!post.getAuthor().equals(user)) {
@@ -80,6 +84,9 @@ public class PostService {
 
     @Transactional
     public void delete (User user, Long id) {
+        if (user == null) {
+            new Exception404("로그인이 필요합니다.");
+        }
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
         if (!post.getAuthor().equals(user)) {
@@ -90,12 +97,16 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponseDto findById(Long id) {
+    public PostResponseDto findById(User user, Long id) {
         Post entity = postRepository.findById(id)
                 .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
+        boolean like = false;
+        if (user != null) {
+            like = likeService.findLikeByUserAndPost(user, entity);
+        }
 
         entity.updateViews();
-        return new PostResponseDto(entity);
+        return new PostResponseDto(entity, like);
     }
 
     @Transactional(readOnly = true)
@@ -116,4 +127,6 @@ public class PostService {
         return postRepository.findAll(pageable)
                 .map(p -> PostListResponseDto.builder().entity(p).build());
     }
+
+
 }

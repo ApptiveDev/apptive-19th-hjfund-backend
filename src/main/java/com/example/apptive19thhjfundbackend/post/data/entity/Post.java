@@ -40,6 +40,9 @@ public class Post extends BaseTimeEntity {
     @Column(nullable = false)
     private int views;
 
+    @Column(nullable = false)
+    private int likes;
+
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
@@ -65,6 +68,13 @@ public class Post extends BaseTimeEntity {
 
     public void updateViews() {
         this.views++;
+    }
+    public void updateLikes(boolean state) {
+        if (state) {
+            this.likes++;
+        }else {
+            this.likes--;
+        }
     }
 
 }

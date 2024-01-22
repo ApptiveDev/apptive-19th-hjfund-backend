@@ -1,9 +1,6 @@
 package com.example.apptive19thhjfundbackend.post.controller;
 
-import com.example.apptive19thhjfundbackend.post.data.dto.PostListResponseDto;
-import com.example.apptive19thhjfundbackend.post.data.dto.PostResponseDto;
-import com.example.apptive19thhjfundbackend.post.data.dto.PostSaveRequestDto;
-import com.example.apptive19thhjfundbackend.post.data.dto.PostUpdateRequestDto;
+import com.example.apptive19thhjfundbackend.post.data.dto.*;
 import com.example.apptive19thhjfundbackend.post.service.PostService;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import com.example.apptive19thhjfundbackend.utils.ApiUtils;
@@ -26,17 +23,17 @@ public class PostController {
 
     private final PostService postService;
     @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE}, path = "/")
-    public ResponseEntity<?> save(@AuthenticationPrincipal User user, @ModelAttribute PostSaveRequestDto requestDto) {
-        postService.save(user, requestDto);
+    public ResponseEntity<ApiUtils.ApiResult<PostSaveResponseDto>> save(@AuthenticationPrincipal User user, @ModelAttribute PostSaveRequestDto requestDto) {
+        PostSaveResponseDto responseDto = postService.save(user, requestDto);
 
-        ApiUtils.ApiResult<?> apiResult = ApiUtils.success(null);
+        ApiUtils.ApiResult<PostSaveResponseDto> apiResult = ApiUtils.success(responseDto);
         return ResponseEntity.ok(apiResult);
 //        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
     @ResponseBody
     @PutMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},path = "/{id}")
-    public ResponseEntity<?> update(@AuthenticationPrincipal User user, @PathVariable Long id, @ModelAttribute PostUpdateRequestDto requestDto)
+    public ResponseEntity<ApiUtils.ApiResult<?>> update(@AuthenticationPrincipal User user, @PathVariable Long id, @ModelAttribute PostUpdateRequestDto requestDto)
     {
         postService.update(user, id, requestDto);
         ApiUtils.ApiResult<?> apiResult = ApiUtils.success(null);
@@ -45,17 +42,17 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id)
+    public ResponseEntity<ApiUtils.ApiResult<PostResponseDto>> findById(@AuthenticationPrincipal User user, @PathVariable Long id)
     {
-        PostResponseDto responseDto = postService.findById(id);
-        ApiUtils.ApiResult<?> apiResult = ApiUtils.success(responseDto);
+        PostResponseDto responseDto = postService.findById(user, id);
+        ApiUtils.ApiResult<PostResponseDto> apiResult = ApiUtils.success(responseDto);
         return ResponseEntity.ok(apiResult);
 //        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
     @ResponseBody
     @DeleteMapping("/{id}")
     //본인이 쓴 글 여부 체크 코드 추가 예정
-    public ResponseEntity<?> delete(@AuthenticationPrincipal User user, @PathVariable Long id)
+    public ResponseEntity<ApiUtils.ApiResult<?>> delete(@AuthenticationPrincipal User user, @PathVariable Long id)
     {
         postService.delete(user, id);
         ApiUtils.ApiResult<?> apiResult = ApiUtils.success(null);
@@ -64,12 +61,13 @@ public class PostController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> findAll(@RequestParam int count, @RequestParam int index, @RequestParam String sortby)
+    public ResponseEntity<ApiUtils.ApiResult<Page<PostListResponseDto>>> findAll(@RequestParam int count, @RequestParam int index, @RequestParam String sortby)
     {
         Page<PostListResponseDto> responseDto = postService.findAllDesc(count, index, sortby);
-        ApiUtils.ApiResult<?> apiResult = ApiUtils.success(responseDto);
+        ApiUtils.ApiResult<Page<PostListResponseDto>> apiResult = ApiUtils.success(responseDto);
         return ResponseEntity.ok(apiResult);
 //        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
+
 
 }
