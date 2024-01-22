@@ -61,9 +61,9 @@ public class PostController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<ApiUtils.ApiResult<Page<PostListResponseDto>>> findAll(@RequestParam int count, @RequestParam int index, @RequestParam String sortby)
+    public ResponseEntity<ApiUtils.ApiResult<Page<PostListResponseDto>>> findAll(@AuthenticationPrincipal User user, @RequestParam int count, @RequestParam int index, @RequestParam String sortby)
     {
-        Page<PostListResponseDto> responseDto = postService.findAllDesc(count, index, sortby);
+        Page<PostListResponseDto> responseDto = postService.findAllDesc(user, count, index, sortby);
         ApiUtils.ApiResult<Page<PostListResponseDto>> apiResult = ApiUtils.success(responseDto);
         return ResponseEntity.ok(apiResult);
 //        return ResponseEntity.status(HttpStatus.OK).body(responseDto);

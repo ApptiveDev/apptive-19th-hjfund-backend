@@ -4,6 +4,7 @@ import com.example.apptive19thhjfundbackend.S3.ImageS3Service;
 import com.example.apptive19thhjfundbackend.file.dao.ContentFileRepository;
 import com.example.apptive19thhjfundbackend.file.entity.ContentFile;
 import com.example.apptive19thhjfundbackend.post.data.dto.*;
+import com.example.apptive19thhjfundbackend.post.data.entity.Like;
 import com.example.apptive19thhjfundbackend.post.data.entity.Post;
 import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
@@ -34,7 +35,7 @@ public class PostService {
     public PostSaveResponseDto save(User author, PostSaveRequestDto requestDto)
     {
         if (author == null) {
-            new Exception404("로그인이 필요합니다.");
+            throw new Exception404("로그인이 필요합니다.");
         }
         Post post = postRepository.save(requestDto.toEntity(author));
 
@@ -52,7 +53,7 @@ public class PostService {
     @Transactional
     public Long update(User user, Long id, PostUpdateRequestDto requestDto) {
         if (user == null) {
-            new Exception404("로그인이 필요합니다.");
+            throw new Exception404("로그인이 필요합니다.");
         }
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
@@ -85,7 +86,7 @@ public class PostService {
     @Transactional
     public void delete (User user, Long id) {
         if (user == null) {
-            new Exception404("로그인이 필요합니다.");
+            throw new Exception404("로그인이 필요합니다.");
         }
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new Exception404("해당 게시글이 없습니다. id=" + id));
@@ -111,12 +112,12 @@ public class PostService {
 
     @Transactional(readOnly = true)
     //정렬 기준에 따라 정렬하는 코드 추가 예정
-    public Page<PostListResponseDto> findAllDesc(int count, int index, String sortby) {
+    public Page<PostListResponseDto> findAllDesc(User user, int count, int index, String sortby) {
         Sort sort = null;
-        if (sortby.equals("POPULAR")) {
+        if (sortby.toUpperCase().equals("POPULAR")) {
             sort = Sort.by("views").descending();
         }
-        else if (sortby.equals("RECENT")) {
+        else if (sortby.toUpperCase().equals("RECENT")) {
             sort = Sort.by("createAt").descending();
         }
         else {
@@ -124,8 +125,15 @@ public class PostService {
         }
         Pageable pageable = PageRequest.of(index, count, sort);
 
+        if (user != null) {
+            List<Post> likes = likeService.findLikeByUser(user);
+            return postRepository.findAll(pageable)
+                    .map(p -> PostListResponseDto.builder().entity(p).state(likes.contains(p)).build());
+        }
+
         return postRepository.findAll(pageable)
-                .map(p -> PostListResponseDto.builder().entity(p).build());
+                .map(p -> PostListResponseDto.builder().entity(p).state(false).build());
+
     }
 
 
