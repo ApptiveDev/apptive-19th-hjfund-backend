@@ -1,5 +1,6 @@
 package com.example.apptive19thhjfundbackend.user.service;
 
+import com.example.apptive19thhjfundbackend.post.data.dto.PostListResponseDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.*;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import org.springframework.data.domain.Page;
@@ -16,4 +17,6 @@ public interface UserService {
 
     CreatorResponseDto allCreator(Pageable pageable);
     CreatorPost creatorPosts(Long id, Pageable pageable);
+
+    Page<PostListResponseDto> findLikeByUser(Pageable pageable);
 }

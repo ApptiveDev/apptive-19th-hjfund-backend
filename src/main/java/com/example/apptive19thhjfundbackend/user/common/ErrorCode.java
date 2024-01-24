@@ -32,10 +32,16 @@ public enum ErrorCode {
      */
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "C005","Not allowed method."),
 
+
+    /*
+     * 409 CONFLICT: 이미 존재하는 리소스와 충돌
+     */
+    CONFLICT(HttpStatus.CONFLICT, "C009", "Conflict."),
+
     /*
      * 500 INTERNAL_SERVER_ERROR: 내부 서버 오류
      */
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C006","Server error.");
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C010","Server error.");
 
 
     private final HttpStatus status;

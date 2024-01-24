@@ -1,6 +1,7 @@
 package com.example.apptive19thhjfundbackend.user.controller;
 
 
+import com.example.apptive19thhjfundbackend.post.data.dto.PostListResponseDto;
 import com.example.apptive19thhjfundbackend.user.data.dto.*;
 import com.example.apptive19thhjfundbackend.user.data.entity.User;
 import com.example.apptive19thhjfundbackend.user.data.repository.UserRepository;
@@ -8,6 +9,9 @@ import com.example.apptive19thhjfundbackend.user.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -65,5 +69,12 @@ public class UserController {
     public ResponseEntity<String> delete() {
         userService.delete();
         return ResponseEntity.status(HttpStatus.OK).body("삭제되었습니다.");
+    }
+
+    @GetMapping(value = "/like") // 내가 좋아요한 게시물
+    public Page<PostListResponseDto> like(@RequestParam int index, @RequestParam int count) {
+        PageRequest pageRequest = PageRequest.of(index, count);
+        Page<PostListResponseDto> posts = userService.findLikeByUser(pageRequest);
+        return posts;
     }
 }
