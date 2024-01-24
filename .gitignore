@@ -19,6 +19,7 @@ bin/
 
 ### IntelliJ IDEA ###
 application.properties
+keystore.p12
 .idea
 *.iws
 *.iml

@@ -35,7 +35,7 @@ public class SignServiceImpl implements SignService {
     @Override
     public SignUpResultDto signUp(String id, String password, String name, String role) throws Exception {
         if (userRepository.getByUid(id)!=null) {
-            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
+            throw new RestApiException(ErrorCode.CONFLICT);
         }
 
         LOGGER.info("[getSignUpResult] 회원 가입 정보 전달");

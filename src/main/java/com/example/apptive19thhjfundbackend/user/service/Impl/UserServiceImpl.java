@@ -3,8 +3,10 @@ package com.example.apptive19thhjfundbackend.user.service.Impl;
 
 import com.example.apptive19thhjfundbackend.S3.ImageS3Service;
 
+import com.example.apptive19thhjfundbackend.post.data.dto.PostListResponseDto;
 import com.example.apptive19thhjfundbackend.post.data.entity.Post;
 import com.example.apptive19thhjfundbackend.post.data.repository.PostRepository;
+import com.example.apptive19thhjfundbackend.post.service.LikeService;
 import com.example.apptive19thhjfundbackend.user.config.security.JwtTokenProvider;
 
 import com.example.apptive19thhjfundbackend.user.data.dto.CreatorPost;
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
     private final PostRepository postRepository;
     private final ProfileRepository profileRepository;
     private final ImageS3Service imageS3Service;
+    private final LikeService likeService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -111,5 +115,17 @@ public class UserServiceImpl implements UserService {
         Page<Post> posts = postRepository.findByAuthorId(id, pageable);
 
         return new CreatorPost(user.toUserInfo(), posts);
+    }
+
+    public Page<PostListResponseDto> findLikeByUser(Pageable pageable) {
+        User user = userInfo();
+        if (user != null) {
+        List<Post> likes = likeService.findLikeByUser(user);
+        return postRepository.findAll(pageable)
+                .map(p -> PostListResponseDto.builder().entity(p).state(likes.contains(p)).build());
+        }
+
+        return postRepository.findAll(pageable)
+            .map(p -> PostListResponseDto.builder().entity(p).state(false).build());
     }
 }
