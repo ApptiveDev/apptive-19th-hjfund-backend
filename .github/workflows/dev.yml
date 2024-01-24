@@ -23,3 +23,18 @@ jobs:
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: build
+    - name: Docker Login
+      uses: docker/login-action@v3.0.0
+      with:
+        username: ${{secrets.DOCKERHUB_USERNAME}}
+        password: ${{secrets.DOCKERHUB_TOKEN}}
+    - name: Build and push Docker images
+      env:
+        NAME: insd47
+        REPO: stocktree-backend-dev
+      run: |
+        docker build -t $REPO .
+        docker tag $REPO:latest $NAME/$REPO:latest
+        docker push $NAME/$REPO:latest
+      
+        
