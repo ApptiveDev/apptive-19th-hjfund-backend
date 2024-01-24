@@ -1,4 +1,4 @@
-name: Deploy Automation of Production Branch
+name: Production Branch Deploy Automation
 
 on:
   push:
