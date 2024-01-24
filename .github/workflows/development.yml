@@ -3,7 +3,7 @@ name: Development Branch Deploy Automation
 on:
   push:
     branches:
-      - development
+      - main
 
 env:
   DOCKERHUB_USERNAME: insd47
