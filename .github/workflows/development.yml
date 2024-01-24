@@ -1,9 +1,9 @@
-name: Deploy Automation of Production Branch
+name: Development Branch Deploy Automation
 
 on:
   push:
     branches:
-      - production
+      - development
 
 env:
   DOCKERHUB_USERNAME: insd47
