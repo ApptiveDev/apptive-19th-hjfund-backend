@@ -32,9 +32,10 @@ jobs:
       env:
         NAME: insd47
         REPO: stocktree-backend
+        TAG: production
       run: |
-        docker build -t $REPO .
-        docker tag $REPO:latest $NAME/$REPO:latest
-        docker push $NAME/$REPO:latest
+        docker build --build-arg DEPLOY_TYPE=$TAG -t $REPO .
+        docker tag $REPO:latest $NAME/$REPO:$TAG
+        docker push $NAME/$REPO:$TAG
       
         
