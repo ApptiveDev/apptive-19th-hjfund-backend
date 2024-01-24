@@ -1,9 +1,19 @@
-name: Deploy Automation of Development Branch
+name: Deploy Automation of Production Branch
 
 on:
   push:
     branches:
-      - main
+      - production
+
+env:
+  DOCKERHUB_USERNAME: insd47
+  DOCKERHUB_REPO: stocktree-backend
+  DOCKERHUB_REPO_TAG: development
+  EC2_USERNAME: ubuntu
+  EC2_INSTANCE_IP: ${{ secrets.EC2_INSTANCE_IP }}
+  COMPOSE_DIRECTORY: ~/stocktree
+  COMPOSE_SERVICE: backend_dev
+  
 
 permissions:
   contents: read
@@ -32,14 +42,10 @@ jobs:
         password: ${{secrets.DOCKERHUB_TOKEN}}
         
     - name: Build and push Docker images
-      env:
-        NAME: insd47
-        REPO: stocktree-backend
-        TAG: development
       run: |
-        docker build --build-arg STOCKTREE_DEPLOY_TYPE=$TAG -t $REPO .
-        docker tag $REPO:latest $NAME/$REPO:$TAG
-        docker push $NAME/$REPO:$TAG
+        docker build --build-arg HJFUND_DEPLOY_TYPE=$DOCKERHUB_REPO_TAG -t $DOCKERHUB_REPO .
+        docker tag $DOCKERHUB_REPO:latest $DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$DOCKERHUB_REPO_TAG
+        docker push $DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$DOCKERHUB_REPO_TAG
         
     - name: Prepare to Deploy
       uses: webfactory/ssh-agent@v0.8.0
@@ -47,14 +53,9 @@ jobs:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
     - name: Deploy Service
-      env:
-        USERNAME: ubuntu
-        INSTANCE_IP: ${{ secrets.EC2_INSTANCE_IP }}
-        DIRECTORY: ~/stocktree
-        SERVICE: backend_dev
       run: |
-        ssh -T $USERNAME@$INSTANCE_IP << EOF
-          cd $DIRECTORY
-          docker-compose pull $SERVICE
-          docker-compose up -d $SERVICE
+        ssh -T $EC2_USERNAME@$EC2_INSTANCE_IP << EOF
+          cd $COMPOSE_DIRECTORY
+          docker-compose pull $COMPOSE_SERVICE
+          docker-compose up -d $COMPOSE_SERVICE
         EOF
