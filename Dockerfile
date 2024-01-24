@@ -9,6 +9,6 @@ ARG JAR_FILE
 WORKDIR /app
 
 COPY ${JAR_FILE} app.jar
-RUN chmod +x /app.jar
+RUN chmod +x app.jar
 
 CMD ["java", "-jar", "app.jar"]
