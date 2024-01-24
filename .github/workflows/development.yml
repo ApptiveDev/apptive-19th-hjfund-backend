@@ -1,4 +1,4 @@
-name: CI of Development Branch
+name: Deploy Automation of Development Branch
 
 on:
   push:
@@ -19,15 +19,18 @@ jobs:
       with:
         java-version: '11'
         distribution: 'temurin'
+        
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: build
+        
     - name: Docker Login
       uses: docker/login-action@v3.0.0
       with:
         username: ${{secrets.DOCKERHUB_USERNAME}}
         password: ${{secrets.DOCKERHUB_TOKEN}}
+        
     - name: Build and push Docker images
       env:
         NAME: insd47
@@ -37,5 +40,21 @@ jobs:
         docker build --build-arg STOCKTREE_DEPLOY_TYPE=$TAG -t $REPO .
         docker tag $REPO:latest $NAME/$REPO:$TAG
         docker push $NAME/$REPO:$TAG
-      
         
+    - name: Prepare to Deploy
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+    - name: Deploy Service
+      env:
+        USERNAME: ubuntu
+        INSTANCE_IP: ${{ secrets.EC2_INSTANCE_IP }}
+        DIRECTORY: ~/stocktree
+        SERVICE: backend_dev
+      run: |
+        ssh -T $USERNAME@$INSTANCE_IP << EOF
+          cd $DIRECTORY
+          docker-compose pull $SERVICE
+          docker-compose up -d $SERVICE
+        EOF
