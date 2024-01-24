@@ -34,7 +34,7 @@ jobs:
         REPO: stocktree-backend
         TAG: development
       run: |
-        docker build --build-arg DEPLOY_TYPE=$TAG -t $REPO .
+        docker build --build-arg STOCKTREE_DEPLOY_TYPE=$TAG -t $REPO .
         docker tag $REPO:latest $NAME/$REPO:$TAG
         docker push $NAME/$REPO:$TAG
       
