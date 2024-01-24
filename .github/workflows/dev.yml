@@ -31,7 +31,7 @@ jobs:
     - name: Build and push Docker images
       env:
         NAME: insd47
-        REPO: stocktree-backend-dev
+        REPO: stocktree-backend
         TAG: development
       run: |
         docker build --build-arg DEPLOY_TYPE=$TAG -t $REPO .
