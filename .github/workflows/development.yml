@@ -24,6 +24,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Set up Environment
+      run: |
+        echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> $GITHUB_ENV
+        echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> $GITHUB_ENV
+        echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
+        echo "SPRINGBOOT_JWT_SECRET=${{ secrets.SPRINGBOOT_JWT_SECRET }}" >> $GITHUB_ENV
+        echo "CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }}" >> $GITHUB_ENV
+        echo "CLOUD_AWS_CREDENTIALS_SECRETKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }}" >> $GITHUB_ENV
+    
     - name: Set up JDK 11
       uses: actions/setup-java@v3
       with:
