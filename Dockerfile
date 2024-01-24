@@ -6,7 +6,9 @@ ENV HJFUND_DEPLOY_TYPE=${HJFUND_DEPLOY_TYPE}
 
 ARG JAR_FILE
 
-COPY ${JAR_FILE} app.jar
-RUN chmod +x /app/app.jar
+WORKDIR /app
 
-CMD ["java", "-jar", "/app/app.jar"]
+COPY ${JAR_FILE} app.jar
+RUN chmod +x /app.jar
+
+CMD ["java", "-jar", "app.jar"]
