@@ -54,10 +54,16 @@ jobs:
         username: ${{secrets.DOCKERHUB_USERNAME}}
         password: ${{secrets.DOCKERHUB_TOKEN}}
 
+    - name: Get List Of Files
+      run: ls -l build/libs
+
     - name: Determine JAR File Location
       run: |
         PROJECT_NAME=$(grep 'rootProject.name' settings.gradle | awk '{print $NF}' | tr -d "'")
         PROJECT_VERSION=$(grep 'version ' build.gradle | awk '{print $NF}' | tr -d "'")
+
+        echo "name and version: $PROJECT_NAME $PROJECT_VERSION"
+        
         JAR_FILE=$(find build/libs -name "$PROJECT_NAME-$PROJECT_VERSION.jar" | head -n 1)
         echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
 
