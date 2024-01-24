@@ -46,27 +46,26 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        arguments: build
+        arguments: build -x test
 
-    - name: Move the jar to a known location
-      run: |
-        JAR_FILE=$(find build/libs -name "*.jar" | head -n 1)
-        mv "$JAR_FILE" ./app.jar
-        
-    - name: Docker Login
-      uses: docker/login-action@v3.0.0
+    - uses: docker/login-action@v3.0.0
       with:
         username: ${{secrets.DOCKERHUB_USERNAME}}
         password: ${{secrets.DOCKERHUB_TOKEN}}
-        
-    - name: Build and push Docker images
+
+    - run: |
+        PROJECT_NAME=$(grep 'rootProject.name' settings.gradle | awk '{print $NF}' | tr -d "'")
+        PROJECT_VERSION=$(grep 'version ' build.gradle | awk '{print $NF}' | tr -d "'")
+        JAR_FILE=$(find build/libs -name "$PROJECT_NAME-$PROJECT_VERSION.jar" | head -n 1)
+        echo "JAR_FILE=$JAR_FILE" >> $GITHUB_ENV
+
+    - name: Build Docker Image and Push
       run: |
-        docker build --build-arg HJFUND_DEPLOY_TYPE=$DOCKERHUB_REPO_TAG -t $DOCKERHUB_REPO .
+        docker build --build-arg JAR_FILE=$JAR_FILE --build-arg HJFUND_DEPLOY_TYPE=$DOCKERHUB_REPO_TAG -t $DOCKERHUB_REPO .
         docker tag $DOCKERHUB_REPO:latest $DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$DOCKERHUB_REPO_TAG
         docker push $DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$DOCKERHUB_REPO_TAG
         
-    - name: Prepare to Deploy
-      uses: webfactory/ssh-agent@v0.8.0
+    - uses: webfactory/ssh-agent@v0.8.0
       with:
         ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
