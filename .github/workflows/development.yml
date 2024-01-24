@@ -1,4 +1,4 @@
-name: Development Branch Deploy Automation
+name: Deploy (Development)
 
 on:
   push:
