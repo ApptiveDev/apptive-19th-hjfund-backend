@@ -48,8 +48,10 @@ jobs:
       with:
         arguments: build
 
-    - name: Move app.jar to Root
-      run: find . -type f -name "*.jar" -print -quit -exec mv {} ./app.jar \;
+    - name: Move the jar to a known location
+      run: |
+        JAR_FILE=$(find build/libs -name "*.jar" | head -n 1)
+        mv "$JAR_FILE" ./app.jar
         
     - name: Docker Login
       uses: docker/login-action@v3.0.0
