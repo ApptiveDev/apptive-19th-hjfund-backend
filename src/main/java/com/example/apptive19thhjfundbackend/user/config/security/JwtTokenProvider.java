@@ -77,7 +77,7 @@ public class JwtTokenProvider {
 
         if (cookies == null) {
             LOGGER.info("[resolveToken] 쿠키가 존재하지 않습니다.");
-            return "";
+            return null;
         }
 
         for (Cookie cookie : cookies) {
@@ -88,7 +88,7 @@ public class JwtTokenProvider {
         }
 
         LOGGER.info("[resolveToken] token이 존재하지 않습니다.");
-        return "";
+        return null;
     }
 
     public boolean validateToken(String token) {
