@@ -22,13 +22,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowCredentials(true)
                 .maxAge(MAX_AGE_SECS);
 
+        String deployType = prop.getProperty("hjfund.deploy.type");
+
         // deploy.type에 따라 다른 도메인을 허용한다.
-        if (prop.getProperty("hjfund.deploy.type").equals("develop")) {
+        if (deployType.equals("develop")) {
             registry.addMapping("/**")
                     .allowedOrigins(prop.getProperty("hjfund.deploy.develop_origin"));
         }
 
-        if (prop.getProperty("hjfund.deploy.type").equals("main")) {
+        if (deployType.equals("main")) {
             registry.addMapping("/**")
                     .allowedOrigins(prop.getProperty("hjfund.deploy.main_origin"));
         }
