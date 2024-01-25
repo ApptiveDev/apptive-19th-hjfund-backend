@@ -58,12 +58,12 @@ public class SignController {
             cookieBuilder = ResponseCookie.from("token", signInResultDto.getToken())
                     .path("/")
                     .maxAge(3600*24*30)
-                    .httpOnly(true)
+                    .httpOnly(false)
                     .secure(true);
         } else {
             cookieBuilder = ResponseCookie.from("token", signInResultDto.getToken())
                     .path("/")
-                    .httpOnly(true)
+                    .httpOnly(false)
                     .secure(true);
         }
 
