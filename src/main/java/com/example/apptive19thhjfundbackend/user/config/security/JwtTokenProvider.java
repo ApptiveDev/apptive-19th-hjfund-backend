@@ -82,7 +82,7 @@ public class JwtTokenProvider {
 
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals("token")) {
-                LOGGER.info("[resolveToken] 쿠키에서 token을 추출했습니다. token : {}", cookie.getValue());
+                LOGGER.info("[resolveToken] 쿠키에서 token을 성공적으로 추출했습니다. token : ***");
                 return cookie.getValue();
             }
         }
