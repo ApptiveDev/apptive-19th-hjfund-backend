@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.PostUpdate;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,11 +47,21 @@ public class SignController {
             LOGGER.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", signInDto.getEmail(), signInResultDto.getToken());
         }
 
-        ResponseCookie cookie = ResponseCookie.from("token", signInResultDto.getToken())
-                .path("/")
-                .sameSite("None")
-                .httpOnly(false)
-                .build();
+        ResponseCookie cookie;
+        if(signInDto.getKeep()) {
+            cookie = ResponseCookie.from("token", signInResultDto.getToken())
+                    .path("/")
+                    .sameSite("None")
+                    .maxAge(3600*24*30)
+                    .httpOnly(false)
+                    .build();
+        } else {
+            cookie = ResponseCookie.from("token", signInResultDto.getToken())
+                    .path("/")
+                    .sameSite("None")
+                    .httpOnly(false)
+                    .build();
+        }
 
         response.addHeader("Cookie", cookie.toString());
 
@@ -60,11 +71,15 @@ public class SignController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<SignUpResultDto> signUp(
+            HttpServletRequest request,
+            HttpServletResponse response,
             @RequestBody SignUpDto signUpDto) throws Exception {
         LOGGER.info("[signUp] 회원가입을 수행합니다. id : {}, pw : ****, name : {}, role : {}", signUpDto.getEmail(), signUpDto.getName(), "USER");
         SignUpResultDto signUpResultDto = signService.signUp(signUpDto.getEmail(), signUpDto.getPassword(), signUpDto.getName(), "USER");
-
         LOGGER.info("[signUp] 회원가입을 완료했습니다. id : {}", signUpDto.getEmail());
+
+        signIn(response, signUpDto.toSignInDto());
+
         return ResponseEntity.status(HttpStatus.OK).body(signUpResultDto);
     }
 

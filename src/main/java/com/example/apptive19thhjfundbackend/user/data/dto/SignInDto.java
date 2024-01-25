@@ -8,4 +8,14 @@ import lombok.Setter;
 public class SignInDto {
     private String email;
     private String password;
+    private boolean keep;
+
+    public boolean getKeep() {
+        return keep;
+    }
+    public void setKeep(boolean keep) {
+        this.keep = keep;
+    }
+    public SignInDto() {
+    }
 }

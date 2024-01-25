@@ -82,13 +82,13 @@ public class SignServiceImpl implements SignService {
 
         LOGGER.info("[getSignInResult] 패스워드 비교 수행");
         if(user==null) {
-            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
+            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST, "유저 없음");
         }
         if(!(user.getUid().equals(id))) {
-            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
+            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST, "아이디 일치 x");
         }
         if(!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST);
+            throw new RestApiException(ErrorCode.UNAUTHORIZED_REQUEST, "비번 일치 x");
         }
         LOGGER.info("[getSignInResult] 패스워드 일치");
 
