@@ -24,8 +24,10 @@ env:
   BRANCH: ${{ github.ref }}
   TEST: false
 
+  DOCKERHUB_REPO_TAG: develop
+
   # MAIN_COMPOSE_SERVICE: backend_dev
-  MAIN_DOCKERHUB_REPO_TAG: development
+  # MAIN_DOCKERHUB_REPO_TAG: main
 
   # DEVELOP_COMPOSE_SERVICE: backend_dev
   # DEVELOP_DOCKERHUB_REPO_TAG: develop
@@ -49,13 +51,13 @@ jobs:
           echo "CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }}" >> $GITHUB_ENV
           echo "CLOUD_AWS_CREDENTIALS_SECRETKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }}" >> $GITHUB_ENV
 
-      - name: Set up Development Tag
-        if: contains(github.ref, 'develop')
-        run: echo "DOCKERHUB_REPO_TAG=$DEVELOP_DOCKERHUB_REPO_TAG" >> $GITHUB_ENV
+      # - name: Set up Development Tag
+      #   if: contains(github.ref, 'develop')
+      #   run: echo "DOCKERHUB_REPO_TAG=$DEVELOP_DOCKERHUB_REPO_TAG" >> $GITHUB_ENV
 
-      - name: Set up Production Tag
-        if: contains(github.ref, 'main')
-        run: echo "DOCKERHUB_REPO_TAG=$MAIN_DOCKERHUB_REPO_TAG" >> $GITHUB_ENV
+      # - name: Set up Production Tag
+      #   if: contains(github.ref, 'main')
+      #   run: echo "DOCKERHUB_REPO_TAG=$MAIN_DOCKERHUB_REPO_TAG" >> $GITHUB_ENV
 
       - name: Get Project Name and Version
         run: |
@@ -119,8 +121,6 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -T $SERVER_USERNAME@$SERVER_IP << EOF
             cd $COMPOSE_DIRECTORY
-            doppler run -- docker compose pull backend
-            doppler run -- docker compose pull backend_dev
-            doppler run -- docker compose up -d backend_dev
-            doppler run -- docker compose up -d backend
+            doppler run -- docker compose pull backend backend_dev
+            doppler run -- docker compose up -d backend backend_dev
           EOF
