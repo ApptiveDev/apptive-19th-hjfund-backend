@@ -22,24 +22,20 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-
-        // 모든 경로에 대해
-        registry.addMapping("/**")
-                // GET, POST, PUT, PATCH, DELETE, OPTIONS 메서드를 허용한다.
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(MAX_AGE_SECS);
-
-        // deploy.type에 따라 다른 도메인을 허용한다.
+        // Origin 불러오기
+        String[] allowedOrigins;
         if (deployType.equals("develop")) {
-            registry.addMapping("/**")
-                    .allowedOrigins(developOrigin);
+            allowedOrigins = new String[]{developOrigin};
+        } else {
+            allowedOrigins = new String[]{mainOrigin};
         }
 
-        if (deployType.equals("main")) {
-            registry.addMapping("/**")
-                    .allowedOrigins(mainOrigin);
-        }
+        registry.addMapping("/**")
+            .allowedOrigins(allowedOrigins)
+            .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true)
+            .maxAge(MAX_AGE_SECS);
+    }
     }
 }
