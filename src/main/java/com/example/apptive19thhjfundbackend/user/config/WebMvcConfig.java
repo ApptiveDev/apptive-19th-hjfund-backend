@@ -31,7 +31,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         }
 
         registry.addMapping("/**")
-            .allowedOrigins("/api/user/**", "/api/stock/**")
             .allowedOrigins(allowedOrigins)
             .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .allowedHeaders("*")
