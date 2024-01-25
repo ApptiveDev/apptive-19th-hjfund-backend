@@ -92,6 +92,26 @@ public class SignController {
         return ResponseEntity.status(HttpStatus.OK).body(signUpResultDto);
     }
 
+    @PostMapping(value = "/logout")
+    public ResponseEntity<String> signOut(
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        LOGGER.info("[signOut] 로그아웃을 시도합니다.");
+
+        ResponseCookieBuilder cookie = ResponseCookie.from("token", "")
+                .path("/")
+                .maxAge(0)
+                .httpOnly(true)
+                .secure(true);
+                
+        if (!deployType.equals("main")) {
+            cookie.sameSite("None");
+        }
+
+        response.addHeader("Set-Cookie", cookie.toString());
+        return ResponseEntity.status(HttpStatus.OK).body("");
+    }
+
      /*
      *login/oauth
      */
