@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +23,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @RestController
 @RequestMapping("/api/user/auth")
@@ -39,6 +41,8 @@ public class SignController {
             HttpServletResponse response,
             @RequestBody SignInDto signInDto)
             throws RuntimeException {
+        Properties prop = new Properties();
+
         LOGGER.info("[signIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", signInDto.getEmail());
         SignInResultDto signInResultDto = signService.signIn(signInDto.getEmail(), signInDto.getPassword());
 
@@ -46,13 +50,19 @@ public class SignController {
             LOGGER.info("[signIn] 정상적으로 로그인되었습니다. id : {}, token : {}", signInDto.getEmail(), signInResultDto.getToken());
         }
 
-        ResponseCookie cookie = ResponseCookie.from("token", signInResultDto.getToken())
-                .path("/")
-                .sameSite("None")
-                .httpOnly(false)
-                .build();
+        String deployType = prop.getProperty("hjfund.deploy.type");
 
-        response.addHeader("Cookie", cookie.toString());
+        ResponseCookieBuilder cookieBuilder = ResponseCookie.from("token", signInResultDto.getToken())
+                .path("/")
+                .httpOnly(true)
+                .secure(true);
+
+        if (!deployType.equals("main")) {
+            cookieBuilder.sameSite("None");
+        }
+        
+        ResponseCookie cookie = cookieBuilder.build();
+        response.addHeader("Set-Cookie", cookie.toString());
 
 //        response.setHeader("X-AUTH-TOKEN", signInResultDto.getToken());
         return ResponseEntity.status(HttpStatus.OK).body(signInResultDto);
