@@ -1,0 +1,105 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+env:
+  DOCKERHUB_USERNAME: insd47
+  DOCKERHUB_REPO: stocktree-backend
+  EC2_USERNAME: ubuntu
+  EC2_INSTANCE_IP: ${{ secrets.EC2_INSTANCE_IP }}
+  COMPOSE_DIRECTORY: ~/stocktree
+  BRANCH: ${{ github.ref }}
+  TEST: false
+
+  MAIN_COMPOSE_SERVICE: backend
+  MAIN_DOCKERHUB_REPO_TAG: latest
+
+  DEVELOP_COMPOSE_SERVICE: backend_dev
+  DEVELOP_DOCKERHUB_REPO_TAG: develop
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Environment
+        run: |
+          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> $GITHUB_ENV
+          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> $GITHUB_ENV
+          echo "SPRINGBOOT_JWT_SECRET=${{ secrets.SPRINGBOOT_JWT_SECRET }}" >> $GITHUB_ENV
+          echo "CLOUD_AWS_CREDENTIALS_ACCESSKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_ACCESSKEY }}" >> $GITHUB_ENV
+          echo "CLOUD_AWS_CREDENTIALS_SECRETKEY=${{ secrets.CLOUD_AWS_CREDENTIALS_SECRETKEY }}" >> $GITHUB_ENV
+
+      - name: Set up Development Tag
+        if: contains(github.ref, 'develop')
+        run: echo "DOCKERHUB_REPO_TAG=$DEVELOP_DOCKERHUB_REPO_TAG" >> $GITHUB_ENV
+
+      - name: Set up Production Tag
+        if: contains(github.ref, 'main')
+        run: echo "DOCKERHUB_REPO_TAG=$MAIN_DOCKERHUB_REPO_TAG" >> $GITHUB_ENV
+
+      - name: Get Project Name and Version
+        run: |
+          echo PROJECT_NAME=$(grep 'rootProject.name' settings.gradle | awk '{print $NF}' | tr -d "'\"") >> $GITHUB_ENV
+          echo PROJECT_VERSION=$(grep '^version\s*=' build.gradle | awk '{print $NF}' | tr -d "'\"") >> $GITHUB_ENV
+
+      - name: Docker Login
+        uses: docker/login-action@v3.0.0
+        with:
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name: Build Docker Image and Push
+        run: |
+          docker build \
+          --build-arg PROJECT_NAME=$PROJECT_NAME \
+          --build-arg PROJECT_VERSION=$PROJECT_VERSION \
+          --build-arg HJFUND_DEPLOY_TYPE=$BRANCH \
+          --build-arg SPRING_DATASOURCE_URL=$SPRING_DATASOURCE_URL \
+          --build-arg SPRING_DATASOURCE_USERNAME=$SPRING_DATASOURCE_USERNAME \
+          --build-arg SPRING_DATASOURCE_PASSWORD=$SPRING_DATASOURCE_PASSWORD \
+          --build-arg SPRINGBOOT_JWT_SECRET=$SPRINGBOOT_JWT_SECRET \
+          --build-arg CLOUD_AWS_CREDENTIALS_ACCESSKEY=$CLOUD_AWS_CREDENTIALS_ACCESSKEY \
+          --build-arg CLOUD_AWS_CREDENTIALS_SECRETKEY=$CLOUD_AWS_CREDENTIALS_SECRETKEY \
+          --build-arg TEST=$TEST \
+          -t $DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$DOCKERHUB_REPO_TAG .
+
+          docker push $DOCKERHUB_USERNAME/$DOCKERHUB_REPO:$DOCKERHUB_REPO_TAG
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Development Environment
+        if: contains(github.ref, 'develop')
+        run: |
+          echo "COMPOSE_SERVICE=$DEVELOP_COMPOSE_SERVICE" >> $GITHUB_ENV
+
+      - name: Set up Production Environment
+        if: contains(github.ref, 'main')
+        run: |
+          echo "COMPOSE_SERVICE=$MAIN_COMPOSE_SERVICE" >> $GITHUB_ENV
+
+      - name: Setting up SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Deploy Service
+        run: |
+          ssh -o StrictHostKeyChecking=no -T $EC2_USERNAME@$EC2_INSTANCE_IP << EOF
+            cd $COMPOSE_DIRECTORY
+            sudo docker compose pull $COMPOSE_SERVICE
+            sudo doppler run -- docker compose up -d $COMPOSE_SERVICE
+          EOF
