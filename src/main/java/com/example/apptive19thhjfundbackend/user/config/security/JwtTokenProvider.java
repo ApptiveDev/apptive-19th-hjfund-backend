@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -72,8 +73,22 @@ public class JwtTokenProvider {
     }
 
     public String resolveToken(HttpServletRequest request) {
-        LOGGER.info("[resolveToken] HTTP 헤더에서 Token 값 추출");
-        return request.getHeader("X-AUTH-TOKEN");
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            LOGGER.info("[resolveToken] 쿠키가 존재하지 않습니다.");
+            return "";
+        }
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("token")) {
+                LOGGER.info("[resolveToken] 쿠키에서 token을 추출했습니다. token : {}", cookie.getValue());
+                return cookie.getValue();
+            }
+        }
+
+        LOGGER.info("[resolveToken] token이 존재하지 않습니다.");
+        return "";
     }
 
     public boolean validateToken(String token) {
