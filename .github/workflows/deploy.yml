@@ -101,7 +101,7 @@ jobs:
 
       - name: Deploy Service
         run: |
-          ssh -o StrictHostKeyChecking=no -T $EC2_USERNAME@$EC2_INSTANCE_IP << EOF
+          ssh -o StrictHostKeyChecking=no -T $SERVER_USERNAME@$SERVER_IP << EOF
             cd $COMPOSE_DIRECTORY
             sudo docker compose pull $COMPOSE_SERVICE
             sudo doppler run -- docker compose up -d $COMPOSE_SERVICE
