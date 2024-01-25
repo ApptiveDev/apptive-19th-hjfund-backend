@@ -25,12 +25,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @RequestMapping("/api/user/auth")
 public class SignController {
     private final Logger LOGGER = LoggerFactory.getLogger(SignController.class);
     private final SignService signService;
+
+    @Value("${hjfund.deploy.type}")
+    private String deployType;
 
     @Autowired
     public SignController(SignService signService) {
@@ -42,8 +46,6 @@ public class SignController {
             HttpServletResponse response,
             @RequestBody SignInDto signInDto)
             throws RuntimeException {
-        Properties prop = new Properties();
-
         LOGGER.info("[signIn] 로그인을 시도하고 있습니다. id : {}, pw : ****", signInDto.getEmail());
         SignInResultDto signInResultDto = signService.signIn(signInDto.getEmail(), signInDto.getPassword());
 
@@ -64,7 +66,6 @@ public class SignController {
                     .httpOnly(false)
                     .secure(true);
         }
-        String deployType = prop.getProperty("hjfund.deploy.type");
 
         if (!deployType.equals("main")) {
             cookieBuilder.sameSite("None");
