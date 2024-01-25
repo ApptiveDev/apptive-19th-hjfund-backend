@@ -58,29 +58,34 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.httpBasic().disable() // UI 기본값 시큐리티 설정 비활성화
-
-                .csrf().disable() // CSRF 비활성화
-
-                .sessionManagement() // 세션 비활성화
-                .sessionCreationPolicy(
-                        SessionCreationPolicy.STATELESS)
-                .and()
-                .cors().configurationSource(corsConfigurationSource())
-                .and()
-                .authorizeRequests()
-                .antMatchers("/api/user/auth/login", "/api/user/auth/register", "/api/stock/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/product/**").permitAll()
-                .antMatchers("**exception**").permitAll()
-                .anyRequest().hasRole("ADMIN")
-                .and()
-                .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler()) // 권한 확인 시 통과 못하는 예외
-                .and()
-                .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint()) // 인증 과정 시 예외
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider),
-                        UsernamePasswordAuthenticationFilter.class);
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .httpBasic().disable()
+            .csrf().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .cors().configurationSource(corsConfigurationSource())
+            .and()
+            .authorizeRequests()
+                // 1. 기본적으로 GET 메소드는 허용. /api/user/* 에 대한 JWT 인증 적용 (단, /api/user/auth 제외)
+                .antMatchers(HttpMethod.GET, "/api/user/**").authenticated()
+                .antMatchers(HttpMethod.GET, "/api/user/auth/**").permitAll()
+                // 2. /api/report/*에 대해 POST, PUT, DELETE는 ADMIN 권한 요구 (단, /api/report/[id]/like 제외)
+                .antMatchers(HttpMethod.POST, "/api/report/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.PUT, "/api/report/**").hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE, "/api/report/**").hasRole("ADMIN")
+                .antMatchers("/api/report/**/like").authenticated()
+                // 3. 특정 POST 요청에 대한 JWT 인증 제외
+                .antMatchers(HttpMethod.POST, "/api/user/auth/login", "/api/user/auth/register").permitAll()
+                // 기타 등등
+                .anyRequest().authenticated()
+            .and()
+            .exceptionHandling()
+                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+            .and()
+            // JWT 인증 필터
+            .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
