@@ -97,17 +97,19 @@ public class SignController {
             HttpServletResponse response) {
         LOGGER.info("[signOut] 로그아웃을 시도합니다.");
 
-        ResponseCookieBuilder cookie = ResponseCookie.from("token", "")
+        ResponseCookieBuilder cookieBuilder = ResponseCookie.from("token", "")
                 .path("/")
                 .maxAge(0)
                 .httpOnly(true)
                 .secure(true);
                 
         if (!deployType.equals("main")) {
-            cookie.sameSite("None");
+            cookieBuilder.sameSite("None");
         }
 
+        ResponseCookie cookie = cookieBuilder.build();
         response.addHeader("Set-Cookie", cookie.toString());
+        
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 
