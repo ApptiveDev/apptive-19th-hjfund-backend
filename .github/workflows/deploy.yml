@@ -4,22 +4,31 @@ on:
   push:
     branches:
       - main
-      - develop
+      # - develop
 
 env:
   DOCKERHUB_USERNAME: insd47
   DOCKERHUB_REPO: stocktree-backend
-  EC2_USERNAME: ubuntu
-  EC2_INSTANCE_IP: ${{ secrets.EC2_INSTANCE_IP }}
-  COMPOSE_DIRECTORY: ~/stocktree
+
+  WIREGUARD_ENDPOINT: ${{ secrets.WIREGUARD_ENDPOINT }}
+  WIREGUARD_ENDPOINT_PUBLIC_KEY: ${{ secrets.WIREGUARD_ENDPOINT_PUBLIC_KEY }}
+  WIREGUARD_IPS: ${{ secrets.WIREGUARD_IPS }}
+  WIREGUARD_ALLOWED_IPS: ${{ secrets.WIREGUARD_ALLOWED_IPS }}
+  WIREGUARD_PRIVATE_KEY: ${{ secrets.WIREGUARD_PRIVATE_KEY }}
+  WIREGUARD_PRESHARED_KEY: ${{ secrets.WIREGUARD_PRESHARED_KEY }}
+
+  SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+  SERVER_IP: ${{ secrets.SERVER_IP }}
+
+  COMPOSE_DIRECTORY: /docker/stocktree
   BRANCH: ${{ github.ref }}
   TEST: false
 
-  MAIN_COMPOSE_SERVICE: backend
-  MAIN_DOCKERHUB_REPO_TAG: latest
+  # MAIN_COMPOSE_SERVICE: backend_dev
+  MAIN_DOCKERHUB_REPO_TAG: development
 
-  DEVELOP_COMPOSE_SERVICE: backend_dev
-  DEVELOP_DOCKERHUB_REPO_TAG: develop
+  # DEVELOP_COMPOSE_SERVICE: backend_dev
+  # DEVELOP_DOCKERHUB_REPO_TAG: develop
 
 permissions:
   contents: read
@@ -81,25 +90,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Development Environment
-        if: contains(github.ref, 'develop')
-        run: |
-          echo "COMPOSE_SERVICE=$DEVELOP_COMPOSE_SERVICE" >> $GITHUB_ENV
+      # - name: Set up Development Environment
+      #   if: contains(github.ref, 'develop')
+      #   run: |
+      #     echo "COMPOSE_SERVICE=$DEVELOP_COMPOSE_SERVICE" >> $GITHUB_ENV
 
-      - name: Set up Production Environment
-        if: contains(github.ref, 'main')
-        run: |
-          echo "COMPOSE_SERVICE=$MAIN_COMPOSE_SERVICE" >> $GITHUB_ENV
+      # - name: Set up Production Environment
+      #   if: contains(github.ref, 'main')
+      #   run: |
+      #     echo "COMPOSE_SERVICE=$MAIN_COMPOSE_SERVICE" >> $GITHUB_ENV
+      
+      - name: Set up WireGuard
+        uses: egor-tensin/setup-wireguard@v1
+        with:
+          endpoint: $WIREGUARD_ENDPOINT
+          endpoint_public_key: $WIREGUARD_ENDPOINT_PUBLIC_KEY
+          ips: $WIREGUARD_IPS
+          allowed_ips: $WIREGUARD_ALLOWED_IPS
+          private_key: $WIREGUARD_PRIVATE_KEY
+          preshared_key: $WIREGUARD_PRESHARED_KEY
 
       - name: Setting up SSH
         uses: webfactory/ssh-agent@v0.8.0
         with:
-          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
 
       - name: Deploy Service
         run: |
-          ssh -o StrictHostKeyChecking=no -T $EC2_USERNAME@$EC2_INSTANCE_IP << EOF
+          ssh -o StrictHostKeyChecking=no -T $SERVER_USERNAME@$SERVER_IP << EOF
             cd $COMPOSE_DIRECTORY
-            sudo docker compose pull $COMPOSE_SERVICE
-            sudo doppler run -- docker compose up -d $COMPOSE_SERVICE
+            doppler run -- docker compose pull backend
+            doppler run -- docker compose pull backend_dev
+            doppler run -- docker compose up -d backend_dev
+            doppler run -- docker compose up -d backend
           EOF
