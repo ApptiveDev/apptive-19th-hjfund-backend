@@ -1,7 +1,5 @@
 package com.example.apptive19thhjfundbackend.user.config;
 
-import java.util.Properties;
-
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -31,7 +29,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
         }
 
         registry.addMapping("/**")
-            .allowedOrigins("/api/user/**", "/api/stock/**")
             .allowedOrigins(allowedOrigins)
             .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .allowedHeaders("*")

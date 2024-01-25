@@ -129,14 +129,14 @@ public class SignController {
 //    public ResponseEntity<Map<String, String>> ExceptionHandler(RuntimeException e) {
 //        HttpHeaders responseHeaders = new HttpHeaders();
 //        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-//
+
 //        LOGGER.error("ExceptionHandler 호출, {}, {}", e.getCause(), e.getMessage());
-//
+
 //        Map<String, String> map = new HashMap<>();
 //        map.put("error type", httpStatus.getReasonPhrase());
 //        map.put("code", "400");
 //        map.put("message", "에러 발생");
-//
+
 //        return new ResponseEntity<>(map, responseHeaders, httpStatus);
 //    }
 }
