@@ -68,6 +68,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
             .authorizeRequests()
                 // 1. 기본적으로 GET 메소드는 허용. /api/user/* 에 대한 JWT 인증 적용 (단, /api/user/auth 제외)
+                .antMatchers(HttpMethod.GET, "/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/user/**").authenticated()
                 .antMatchers(HttpMethod.GET, "/api/user/auth/**").permitAll()
                 // 2. /api/report/*에 대해 POST, PUT, DELETE는 ADMIN 권한 요구 (단, /api/report/[id]/like 제외)
